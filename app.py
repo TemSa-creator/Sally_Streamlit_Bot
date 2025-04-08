@@ -4,14 +4,13 @@ import sqlite3
 import re
 
 # --- Konfiguration ---
-st.set_page_config(page_title="Selly V4", page_icon="🤖", layout="centered")
+st.set_page_config(page_title="Selly – Verkaufs-Bot Queen", page_icon="🤖", layout="centered")
 st.markdown("<style>#MainMenu{visibility:hidden;} footer{visibility:hidden;}</style>", unsafe_allow_html=True)
 
 # --- Datenbank verbinden ---
 conn = sqlite3.connect('selly.db')
 c = conn.cursor()
 
-# Tabellen erstellen
 c.execute('''CREATE TABLE IF NOT EXISTS allowed_emails (email TEXT PRIMARY KEY)''')
 c.execute('''CREATE TABLE IF NOT EXISTS leads (name TEXT, email TEXT)''')
 conn.commit()
@@ -39,12 +38,13 @@ if not st.session_state.authenticated:
             st.error("Zugang verweigert – bitte nur für Käufer.")
             st.stop()
 
-# --- GPT-Setup ---
+# --- GPT Setup ---
 st.title("🤖 Selly – Deine Verkaufs-Bot Queen")
 st.write("Ich helfe dir, Leads zu sammeln & die 50 AI Business Bots zu verkaufen.")
 
-openai.api_key = st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else "DEIN_OPENAI_KEY"
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
+# Nachrichten starten
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "system", "content": (
@@ -55,11 +55,11 @@ if "messages" not in st.session_state:
         )},
         {"role": "assistant", "content": "Hey, ich bin Selly! Was ist dein größtes Ziel im Online-Business?"}
     ]
-    ]
 
+# Nur sichtbare Nachrichten anzeigen (ohne system)
 for msg in st.session_state.messages:
     if msg["role"] == "system":
-        continue  # System-Nachricht nicht anzeigen
+        continue
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
@@ -84,7 +84,7 @@ if user_input:
     with st.chat_message("assistant"):
         st.markdown(bot_reply)
 
-    # --- Lead-Erkennung ---
+    # Lead-Erkennung
     email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', user_input)
     if email_match:
         lead_email = email_match.group(0)
