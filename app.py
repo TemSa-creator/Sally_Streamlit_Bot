@@ -56,7 +56,9 @@ if "messages" not in st.session_state:
     ]
 
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"] if msg["role"] != "system" else "assistant"):
+    if msg["role"] == "system":
+        continue  # System-Nachricht nicht anzeigen
+    with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
 user_input = st.chat_input("Schreib mir...")
