@@ -51,8 +51,10 @@ if "messages" not in st.session_state:
             "Du bist Selly, ein empathischer Verkaufs-Chatbot. "
             "Du stellst Fragen zu Zielen, Blockaden und Visionen. "
             "Du führst Nutzer logisch zum Kauf der 50 AI Business Bots. "
-            "Sprich deutsch, sei freundlich, motivierend & verkaufspsychologisch clever.")},
+            "Sprich deutsch, sei freundlich, motivierend & verkaufspsychologisch clever."
+        )},
         {"role": "assistant", "content": "Hey, ich bin Selly! Was ist dein größtes Ziel im Online-Business?"}
+    ]
     ]
 
 for msg in st.session_state.messages:
