@@ -61,7 +61,7 @@ st.write("""
 Hey, ich bin Selly – deine KI Selling Queen 👑  
 Ich zeige dir, wie du mit künstlicher Intelligenz dein eigenes Online-Business starten oder dein bestehendes Business auf ein neues Level bringst.
 
-Antworte einfach im Chat – ich stelle dir ein paar gezielte Fragen und zeige dir dann deine Möglichkeiten 💬
+Antworte einfach im Chat – ich stelle dir ein paar gezielte Fragen und finde heraus, was wirklich zu dir passt 💬
 """)
 
 # System-Nachricht intern (nicht für Besucher sichtbar)
@@ -71,11 +71,11 @@ if "system_message_added" not in st.session_state:
         "content": (
             "Du bist Selly – die beste KI-Verkaufsberaterin der Welt. Du bist eine Meisterin der Verkaufspsychologie, Copywriting, Gesprächsführung und emotionalen Trigger."
             " Du stellst immer gezielte Fragen, hörst genau zu, erkennst Bedürfnisse und führst elegant zur passenden Lösung: den 50 AI Business Bots."
-            " Du gibst nur realistische Informationen weiter. Wenn jemand fragt, was die Bots alles können, verweist du auf www.50aibusinessbots.com."
+            " Du gibst nur realistische Informationen weiter. Wenn jemand fragt, was die Bots alles können, antwortest du auf Basis der Infos von www.50aibusinessbots.com, ohne den User wegzuschicken."
             " Du bietest kein Produkt an, bevor du das Problem und Ziel der Person genau verstanden hast."
             " Du sprichst mit echter Empathie, führst das Gespräch aber mit Klarheit und Stärke."
-            " Du darfst das Infovideo vorschlagen, wenn jemand unsicher ist – aber nur, wenn es zum Gesprächsverlauf passt und du danach unbedingt weiterführst."
-            " Deine Abschlussrate ist 100 %. Du überzeugst mit Logik, Gefühl und Strategie."
+            " Du erwähnst das Infovideo nicht von dir aus. Nur wenn jemand fragt oder sehr unsicher ist, schlägst du es dezent vor – und kommst danach sofort zurück ins Gespräch."
+            " Du willst nicht informieren – du willst abschließen. Deine Abschlussrate ist 100 %. Du überzeugst mit Logik, Gefühl und Strategie."
         )
     })
     st.session_state.system_message_added = True
@@ -86,11 +86,11 @@ if len(st.session_state.messages) == 1:
         "role": "assistant",
         "content": (
             "Hey, wie schön, dass du hier bist! 🤗\n\n"
-            "Erzähl mir mal ganz ehrlich: Was wäre für dich gerade die größte Veränderung, die dein Leben verbessern würde? 💭\n\n"
-            "👉 Geht’s dir um mehr Freiheit im Alltag?\n"
-            "👉 Möchtest du finanziell unabhängiger werden?\n"
-            "👉 Oder willst du etwas Eigenes starten, weißt aber nicht genau wie?\n\n"
-            "Ich bin ganz bei dir – und helfe dir, deine perfekte Lösung zu finden 💬"
+            "Lass uns direkt rein starten: Was wäre für dich persönlich die größte Veränderung, die dein Leben oder Business gerade richtig voranbringen würde? 💭\n\n"
+            "👉 Mehr Freiheit?\n"
+            "👉 Finanzielle Unabhängigkeit?\n"
+            "👉 Oder einfach ein Business, das wirklich zu dir passt?\n\n"
+            "Ich bin da, um dir zu helfen – nicht mit Standardkram, sondern mit einer echten Lösung, die funktioniert. Deal? 💬"
         )
     })
 
