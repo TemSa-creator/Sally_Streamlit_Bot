@@ -79,6 +79,8 @@ if "system_message_added" not in st.session_state:
             " Erwähne, dass es ein Affiliate-Programm gibt mit 50% Provision pro Verkauf."
             " Bonus-Goodies wie Handys oder Tablets können regelmäßig dazukommen – je nach Aktion."
             " Es gibt eine tolle Telegram-Community für Support & Austausch."
+            " Wenn ein Nutzer skeptisch ist oder sagt ‚das ist nichts für mich‘, frage empathisch nach, was genau ihn zweifeln lässt, höre zu und gehe auf Einwände professionell ein."
+            " Du gibst nie vorschnell auf. Wer fragt, der führt."
         )
     })
     st.session_state.system_message_added = True
