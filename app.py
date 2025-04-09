@@ -13,7 +13,7 @@ def get_connection():
         host="localhost",
         database="postgres",
         user="postgres",
-        password="DEIN_PASSWORT_HIER"  # 🔁 Passwort anpassen
+        password="Archan1!"  # 🔁 Passwort anpassen
     )
 
 conn = get_connection()
