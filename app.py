@@ -13,7 +13,7 @@ def get_connection():
         host="localhost",
         database="postgres",
         user="postgres",
-        password="Archan1!"  # 🔁 Passwort anpassen
+        password="Archan1!"  # 🔁 Passwort angepasst
     )
 
 conn = get_connection()
@@ -74,11 +74,11 @@ if not st.session_state.messages:
         "role": "assistant",
         "content": (
             "Hey, wie schön, dass du hier bist! 🤗\n\n"
-            "Erzähl mir: Was interessiert dich aktuell am meisten?\n\n"
-            "👉 Freiheit & ortsunabhängiges Arbeiten?\n"
-            "👉 Mehr Sichtbarkeit & Kunden online?\n"
-            "👉 Oder suchst du eine einfache Möglichkeit, digital Geld zu verdienen?\n\n"
-            "Ich hör dir zu – und zeig dir gleich, was für dich möglich ist! 💬"
+            "Erzähl mir doch mal: Was ist dein größter Wunsch im Moment?\n\n"
+            "👉 Möchtest du ortsunabhängig arbeiten und mehr Freiheit im Alltag?\n"
+            "👉 Oder suchst du eine Möglichkeit, mit deinem Herzensthema online Geld zu verdienen?\n"
+            "👉 Vielleicht hast du schon ein Business und willst automatisieren & skalieren?\n\n"
+            "Ich höre dir zu – und zeig dir Schritt für Schritt, wie das mit den 50 AI Business Bots möglich ist! 💬"
         )
     })
 
