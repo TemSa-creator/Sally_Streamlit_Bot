@@ -23,6 +23,7 @@ conn.commit()
 # --- Login ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+    st.session_state.messages = []  # ← Damit löschen wir alte Nachrichten aus dem Speicher
 
 if not st.session_state.authenticated:
     st.title("🔐 Selly Login")
