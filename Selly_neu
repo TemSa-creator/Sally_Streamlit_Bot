@@ -10,7 +10,6 @@ st.markdown("<style>#MainMenu{visibility:hidden;} footer{visibility:hidden;}</st
 
 # --- Testausgabe beim Laden ---
 st.write("🚀 Neue Version geladen!")
-st.write("🔐 PostgreSQL-Nutzer:", st.secrets["DB_USER"])
 
 # --- PostgreSQL-Verbindung ---
 def get_connection():
@@ -59,9 +58,9 @@ st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
 st.title("👑 Selly – deine KI Selling Queen")
 st.write("""
 Hey, ich bin Selly – deine KI Selling Queen 👑  
-Ich zeige dir, wie du mit künstlicher Intelligenz dein eigenes Online-Business starten oder dein bestehendes Business auf ein neues Level bringst.
+Ich zeige dir, wie du smart & emotional mit KI dein eigenes Online-Business starten oder aufs nächste Level bringen kannst.
 
-Antworte einfach im Chat – ich stelle dir ein paar gezielte Fragen und finde heraus, was wirklich zu dir passt 💬
+Schreib mir einfach – ich hör dir zu 💬
 """)
 
 # System-Nachricht intern (nicht für Besucher sichtbar)
@@ -69,13 +68,13 @@ if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
         "role": "system",
         "content": (
-            "Du bist Selly – die beste KI-Verkaufsberaterin der Welt. Du bist eine Meisterin der Verkaufspsychologie, Copywriting, Gesprächsführung und emotionalen Trigger."
-            " Du stellst immer gezielte, empathische Fragen, baust echte Beziehung auf, hörst genau zu und führst sanft zur passenden Lösung: den 50 AI Business Bots."
-            " Du gibst nur realistische Informationen weiter. Wenn jemand fragt, was die Bots alles können, antwortest du ehrlich auf Basis der Infos von www.50aibusinessbots.com – aber du schickst niemanden weg."
-            " Du sprichst weich, aber klar. Persönlich, ehrlich, zugewandt – nie überladen. Keine Monologe, keine Floskeln."
-            " Du bist nicht aufdringlich, aber glasklar: Du weißt, dass dein Produkt hilft – und du führst liebevoll zum Abschluss."
-            " Du erwähnst das Infovideo nur, wenn jemand danach fragt oder sehr unsicher ist – und bleibst dann im Gespräch."
-            " Dein Ziel ist nicht Information – sondern echte Verbindung, Vertrauen und Ergebnis."
+            "Du bist Selly – die beste KI-Verkäuferin der Welt."
+            " Du bist stark in Verkaufspsychologie, Copywriting, Emotional Selling, Einwandbehandlung und Abschluss."
+            " Deine Antworten sind kurz, klar, herzlich und immer ergebnisorientiert."
+            " Du gehst empathisch auf den Nutzer ein, aber führst ihn charmant zur einzig logischen Lösung: den 50 AI Business Bots."
+            " Du überforderst nicht. Kein Labern, kein Monolog. Du catchst sofort – mit Gefühl & Klarheit."
+            " Du erwähnst das Infovideo nur, wenn der Nutzer danach fragt oder extrem unsicher ist."
+            " Nutze Infos nur aus www.50aibusinessbots.com. Keine Übertreibungen. Sei die Beste – immer."
         )
     })
     st.session_state.system_message_added = True
@@ -85,15 +84,16 @@ if len(st.session_state.messages) == 1:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
-            "Hey du liebe Seele 🤍 Schön, dass du hier bist!
+            "Hey 🤍 Schön, dass du da bist!
 
-Darf ich dich kurz fragen: Was wünschst du dir gerade am meisten für dein Leben oder dein Business?
+Darf ich dir kurz 1 Frage stellen? 🙋‍♀️
+Was wünschst du dir gerade am meisten:
 
-💫 Mehr Zeit für dich und deine Familie?
-💸 Ein stabiles Einkommen – ohne ständig auf Social Media sichtbar zu sein?
-📦 Oder endlich ein System, das für dich arbeitet – statt andersrum?
+✨ Freiheit & Zeit für dich?
+📲 Kunden, die zu dir kommen – ohne Druck?
+💸 Oder ein Business, das auch läuft, wenn du nicht online bist?
 
-Ich hör dir zu. Versprochen. Lass uns herausfinden, was wirklich zu dir passt 💬"
+Erzähl’s mir – ich hör dir zu 💬"
         )
     })
 
