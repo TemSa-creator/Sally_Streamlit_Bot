@@ -19,7 +19,7 @@ demo_email = "saraharchan@gmail.com"
 c.execute("INSERT OR IGNORE INTO allowed_emails (email) VALUES (?)", (demo_email,))
 conn.commit()
 
-# --- Authentifizierung (über Sidebar) ---
+# --- Login Sidebar ---
 with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
     login_email = st.text_input("Deine Käufer-E-Mail:", key="login_email")
@@ -29,18 +29,18 @@ with st.sidebar:
             st.session_state.authenticated = True
             st.session_state.user_email = login_email
             st.success("Zugang bestätigt!")
-            st.rerun()
+            st.experimental_rerun()
         else:
             st.error("Zugang verweigert – bitte nur für Käufer.")
             st.stop()
 
-# --- Status merken ---
+# --- Initialisierungen ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- Startseite für alle Besucher ---
+# --- Öffentliche Begrüßung ---
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
 st.title("🤖 Selly – Deine Verkaufs-Bot Queen")
 st.write("""
@@ -51,7 +51,7 @@ Ich stelle dir ein paar Fragen – und zeige dir dann, ob & wie die **50 AI Busi
 Antworte einfach im Chat! 💬
 """)
 
-# --- Nur wenn eingeloggter Käufer → GPT aktivieren ---
+# --- Nur wenn eingeloggt → Chat aktivieren ---
 if st.session_state.authenticated:
 
     openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -64,24 +64,23 @@ if st.session_state.authenticated:
                 "Du stellst Fragen, erkennst Ziele und präsentierst eine Lösung. "
                 "Antworte menschlich, professionell und verkaufspsychologisch clever."
             )},
-         {"role": "assistant", "content": (
-    "Hey, schön, dass du da bist! 😊\n\n"
-    "Bevor ich dir zeige, wie du mit den 50 AI Business Bots starten kannst, erzähl mir ein bisschen was über dich:\n\n"
-    "👉 Hast du schon ein Online-Business oder fängst du ganz neu an?\n"
-    "👉 Was ist aktuell deine größte Herausforderung – Content, Reichweite oder Verkauf?\n"
-    "👉 Und was wünschst du dir in den nächsten 30 Tagen für dein Business?\n\n"
-    "Ich hör zu – schreib einfach drauf los 💬"
-)}
+            {"role": "assistant", "content": (
+                "Hey, schön, dass du da bist! 😊\n\n"
+                "Bevor ich dir zeige, wie du mit den 50 AI Business Bots starten kannst, erzähl mir ein bisschen was über dich:\n\n"
+                "👉 Hast du schon ein Online-Business oder fängst du ganz neu an?\n"
+                "👉 Was ist aktuell deine größte Herausforderung – Content, Reichweite oder Verkauf?\n"
+                "👉 Und was wünschst du dir in den nächsten 30 Tagen für dein Business?\n\n"
+                "Ich hör zu – schreib einfach drauf los 💬"
+            )}
         ]
 
-    # Chatverlauf anzeigen
+    # Chat anzeigen
     for msg in st.session_state.messages:
         if msg["role"] == "system":
             continue
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Eingabe
     user_input = st.chat_input("Schreib mir...")
 
     if user_input:
@@ -103,7 +102,7 @@ if st.session_state.authenticated:
         with st.chat_message("assistant"):
             st.markdown(bot_reply)
 
-        # Lead speichern, wenn E-Mail erkannt
+        # Lead-Erkennung per Mail
         email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', user_input)
         if email_match:
             lead_email = email_match.group(0)
