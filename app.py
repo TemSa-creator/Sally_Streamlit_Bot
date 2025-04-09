@@ -3,6 +3,8 @@ import openai
 import psycopg2
 import re
 
+st.write("🚀 Neue Version geladen!")  # ✅ Testausgabe für dich
+
 # --- Seiteneinstellungen ---
 st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
 st.markdown("<style>#MainMenu{visibility:hidden;} footer{visibility:hidden;}</style>", unsafe_allow_html=True)
