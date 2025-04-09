@@ -10,24 +10,32 @@ st.markdown("<style>#MainMenu{visibility:hidden;} footer{visibility:hidden;}</st
 # --- Datenbank verbinden ---
 conn = sqlite3.connect('selly.db')
 c = conn.cursor()
-
 c.execute('''CREATE TABLE IF NOT EXISTS allowed_emails (email TEXT PRIMARY KEY)''')
 c.execute('''CREATE TABLE IF NOT EXISTS leads (name TEXT, email TEXT)''')
 conn.commit()
 
-# --- Demo-Mail einfügen (für dich) ---
+# --- Demo-Mail für Testzugang ---
 demo_email = "saraharchan@gmail.com"
 c.execute("INSERT OR IGNORE INTO allowed_emails (email) VALUES (?)", (demo_email,))
 conn.commit()
 
-# --- Login ---
+# --- Auth-Logik ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
-    st.session_state.messages = []  # ← Damit löschen wir alte Nachrichten aus dem Speicher
+    st.session_state.messages = []
 
 if not st.session_state.authenticated:
     st.title("🔐 Selly Login")
-    email_input = st.text_input("Gib bitte deine Käufer-E-Mail-Adresse ein:")
+    st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250, caption="Ich bin Selly – deine Verkaufs-Bot Queen!")
+    st.write("""
+    Willkommen!  
+    Du hast Interesse an einem skalierbaren Online-Business mit KI?  
+    Dann bist du hier richtig!
+
+    👉 Nur Käufer der **50 AI Business Bots** können Selly aktiv nutzen.  
+    Gib bitte deine **Käufer-E-Mail** ein, um loszulegen.
+    """)
+    email_input = st.text_input("Deine Käufer-E-Mail:")
     if st.button("Login"):
         c.execute("SELECT * FROM allowed_emails WHERE email=?", (email_input,))
         if c.fetchone():
@@ -36,34 +44,37 @@ if not st.session_state.authenticated:
             st.success("Zugang bestätigt!")
             st.experimental_rerun()
         else:
-            st.error("Zugang verweigert – bitte nur für Käufer.")
+            st.error("Zugang verweigert – nur für Käufer.")
             st.stop()
 
 # --- GPT Setup ---
-st.title("🤖 Selly – Deine Verkaufs-Bot Queen")
-st.write("Ich helfe dir, Leads zu sammeln & die 50 AI Business Bots zu verkaufen.")
-
+st.title("🤖 Selly – Verkaufs-Bot Queen")
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# Nachrichten starten
+# Startnachrichten
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "system", "content": (
-            "Du bist Selly, ein empathischer Verkaufs-Chatbot. "
-            "Du stellst Fragen zu Zielen, Blockaden und Visionen. "
-            "Du führst Nutzer logisch zum Kauf der 50 AI Business Bots. "
-            "Sprich deutsch, sei freundlich, motivierend & verkaufspsychologisch clever."
+            "Du bist Selly, eine empathische Verkaufs-KI. "
+            "Du führst Anfänger und Fortgeschrittene durch ein Gespräch, um herauszufinden, ob die 50 AI Business Bots zu ihnen passen. "
+            "Du stellst Fragen, erkennst Ziele und präsentierst eine Lösung. "
+            "Antworte menschlich, professionell und emotional intelligent."
         )},
-        {"role": "assistant", "content": "Hey, ich bin Selly! Was ist dein größtes Ziel im Online-Business?"}
+        {"role": "assistant", "content": (
+            "Hey, ich bin Selly! Hast du schon ein Online-Business oder willst du gerade erst starten?\n"
+            "Ich zeig dir, wie du auch ganz ohne Vorkenntnisse mit den 50 AI Business Bots ein eigenes Business aufbauen kannst, "
+            "oder dein bestehendes Business skalieren kannst – durch automatisierte KI-Verkäufe und mehr Reichweite. Schritt für Schritt."
+        )}
     ]
 
-# Nur sichtbare Nachrichten anzeigen (ohne system)
+# Chatverlauf (ohne system anzeigen)
 for msg in st.session_state.messages:
     if msg["role"] == "system":
         continue
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
+# Nutzer-Eingabe
 user_input = st.chat_input("Schreib mir...")
 
 if user_input:
@@ -90,7 +101,7 @@ if user_input:
     if email_match:
         lead_email = email_match.group(0)
         name_match = re.search(r'Mein Name ist\s+([A-Za-zÄ-ÜÖä-üöß\s]+)', user_input) or \
-                     re.search(r'Ich heiße\s+([A-Za-zÄ-ÜÖä-üöß\s]+)', user_input)
+                     re.search(r'Ich heiße\s+([A-Za-zÄ-Üä-üöß\s]+)', user_input)
         lead_name = name_match.group(1).strip() if name_match else ""
 
         c.execute("INSERT INTO leads (name, email) VALUES (?, ?)", (lead_name, lead_email))
