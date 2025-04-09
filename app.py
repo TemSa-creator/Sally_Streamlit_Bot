@@ -4,7 +4,7 @@ import psycopg2
 import re
 
 # --- Seiteneinstellungen ---
-st.set_page_config(page_title="Selly – Verkaufs-Bot Queen", page_icon="🤖", layout="centered")
+st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
 st.markdown("<style>#MainMenu{visibility:hidden;} footer{visibility:hidden;}</style>", unsafe_allow_html=True)
 
 # --- PostgreSQL-Verbindung ---
@@ -51,25 +51,35 @@ if "messages" not in st.session_state:
 
 # --- Begrüßung für alle Besucher ---
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
-st.title("🤖 Selly – Deine Verkaufs-Bot Queen")
+st.title("👑 Selly – deine KI Selling Queen")
 st.write("""
-Hey, ich bin Selly!  
-Willst du wissen, wie du dir mit KI ein eigenes Online-Business aufbauen oder dein bestehendes Business skalieren kannst?
+Hey, ich bin Selly – deine KI Selling Queen 👑  
+Ich helfe dir, dein Online-Business zu starten oder zu skalieren – mit den 50 AI Business Bots. 
 
-Ich stelle dir ein paar Fragen – und zeige dir dann, ob & wie die **50 AI Business Bots** zu dir passen.  
-Antworte einfach im Chat! 💬
+Antworte einfach im Chat – ich stelle dir ein paar gezielte Fragen, damit du weißt, ob die Bots zu dir passen 💬
 """)
 
 # Startnachricht
 if not st.session_state.messages:
     st.session_state.messages.append({
+        "role": "system",
+        "content": (
+            "Du bist Selly – eine KI Selling Queen. "
+            "Du bist spezialisiert auf Verkaufspsychologie und Copywriting. "
+            "Du stellst gezielte Fragen zu Zielen, Herausforderungen und Visionen. "
+            "Du arbeitest effizient, professionell und führst Interessenten immer zur Lösung – den 50 AI Business Bots. "
+            "Du antwortest menschlich, empathisch und intelligent – wie ein echter Verkaufsexperte. "
+            "Du verkaufst ausschließlich die 50 AI Business Bots und leitest klar zur Kaufentscheidung hin."
+        )
+    })
+    st.session_state.messages.append({
         "role": "assistant",
         "content": (
-            "Hey, schön, dass du hier bist! 🤗\n\n"
-            "Darf ich dir ein paar Fragen stellen, um zu sehen, ob die 50 AI Business Bots zu dir passen?\n\n"
-            "👉 Hast du schon ein Business oder willst du gerade erst starten?\n"
-            "👉 Was stresst dich aktuell am meisten – Content, Reichweite oder Verkauf?\n"
-            "👉 Und was wünschst du dir in den nächsten 30 Tagen für dein Business?"
+            "Hey, schön, dass du da bist! 🤗\n\n"
+            "Ich stell dir kurz 3 Fragen – dann zeig ich dir, ob die 50 AI Business Bots zu dir passen.\n\n"
+            "👉 Hast du schon ein Online-Business oder willst du gerade erst starten?\n"
+            "👉 Wo brauchst du am meisten Unterstützung – Content, Technik oder Verkauf?\n"
+            "👉 Und was wünschst du dir in den nächsten 30 Tagen?"
         )
     })
 
@@ -90,13 +100,7 @@ if user_input:
         openai.api_key = st.secrets["OPENAI_API_KEY"]
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=[
-                {"role": "system", "content": (
-                    "Du bist Selly, eine empathische Verkaufs-KI. "
-                    "Du hilfst Nutzern dabei, herauszufinden, ob die 50 AI Business Bots zu ihnen passen. "
-                    "Du stellst gezielte Fragen, motivierst und führst logisch zum Kauf."
-                )}
-            ] + st.session_state.messages,
+            messages=st.session_state.messages,
             temperature=0.7
         )
         bot_reply = response["choices"][0]["message"]["content"]
@@ -115,6 +119,6 @@ if user_input:
         if st.session_state.authenticated:
             st.markdown(f"👉 **Hier ist dein persönlicher Link:** [Jetzt starten]({st.session_state.affiliate_link})")
         else:
-            st.markdown("👉 **Möchtest du mehr erfahren?** Schreib mir einfach weiter!")
+            st.markdown("👉 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
 
 conn.close()
