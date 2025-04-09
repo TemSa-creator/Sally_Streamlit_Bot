@@ -3,7 +3,7 @@ import openai
 import psycopg2
 import re
 
-# --- Seiteneinstellungen ---
+# --- Muss ganz oben stehen: Seiteneinstellungen ---
 st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
 st.markdown("<style>#MainMenu{visibility:hidden;} footer{visibility:hidden;}</style>", unsafe_allow_html=True)
 
@@ -63,8 +63,8 @@ Ich zeige dir, wie du mit künstlicher Intelligenz dein eigenes Online-Business 
 Antworte einfach im Chat – ich stelle dir ein paar gezielte Fragen und zeige dir dann deine Möglichkeiten 💬
 """)
 
-# Startnachricht (für Interessenten sichtbar)
-if not st.session_state.messages:
+# System-Nachricht intern (nicht für Besucher sichtbar)
+if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
         "role": "system",
         "content": (
@@ -74,6 +74,10 @@ if not st.session_state.messages:
             "Du verkaufst nur dieses Produkt – professionell, empathisch und effizient."
         )
     })
+    st.session_state.system_message_added = True
+
+# Begrüßung (nur wenn noch keine Nachrichten vorhanden sind)
+if len(st.session_state.messages) == 1:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
@@ -88,8 +92,9 @@ if not st.session_state.messages:
 
 # Chat anzeigen
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+    if msg["role"] != "system":
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
 # Eingabe
 user_input = st.chat_input("Schreib mir...")
