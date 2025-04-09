@@ -64,11 +64,8 @@ if st.session_state.authenticated:
                 "Du stellst Fragen, erkennst Ziele und präsentierst eine Lösung. "
                 "Antworte menschlich, professionell und verkaufspsychologisch clever."
             )},
-            {"role": "assistant", "content": (
-                "Hey, ich bin Selly! Hast du schon ein Online-Business oder willst du gerade erst starten?\n"
-                "Ich zeig dir, wie du auch ganz ohne Vorkenntnisse mit den 50 AI Business Bots ein eigenes Business aufbauen kannst, "
-                "oder dein bestehendes Business skalieren kannst – durch automatisierte KI-Verkäufe und mehr Reichweite. Schritt für Schritt."
-            )}
+          # keine initiale Begrüßung mehr, da sie oben im Layout steht
+
         ]
 
     # Chatverlauf anzeigen
