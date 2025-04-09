@@ -84,7 +84,7 @@ if len(st.session_state.messages) == 1:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
-            "Hey 🤍 Schön, dass du da bist!
+            "Hey 🤍 Schön, dass du da bist!"
 
 Darf ich dir kurz 1 Frage stellen? 🙋‍♀️
 Was wünschst du dir gerade am meisten:
