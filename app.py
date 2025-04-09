@@ -3,6 +3,10 @@ import openai
 import psycopg2
 import re
 
+# --- Testausgabe beim Laden ---
+st.write("🚀 Neue Version geladen!")
+st.write("🔐 PostgreSQL-Nutzer:", st.secrets["DB_USER"])
+
 # --- Seiteneinstellungen ---
 st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
 st.markdown("<style>#MainMenu{visibility:hidden;} footer{visibility:hidden;}</style>", unsafe_allow_html=True)
@@ -10,10 +14,10 @@ st.markdown("<style>#MainMenu{visibility:hidden;} footer{visibility:hidden;}</st
 # --- PostgreSQL-Verbindung ---
 def get_connection():
     return psycopg2.connect(
-        host="localhost",
-        database="postgres",
-        user="postgres",
-        password="Archan1!"  # 🔁 Passwort angepasst
+        host=st.secrets["DB_HOST"],
+        database=st.secrets["DB_NAME"],
+        user=st.secrets["DB_USER"],
+        password=st.secrets["DB_PASSWORD"]
     )
 
 conn = get_connection()
