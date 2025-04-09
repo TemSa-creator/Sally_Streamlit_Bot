@@ -15,7 +15,6 @@ def get_connection():
         user=st.secrets["DB_USER"],
         password=st.secrets["DB_PASSWORD"]
     )
-    )
 
 conn = get_connection()
 cursor = conn.cursor()
