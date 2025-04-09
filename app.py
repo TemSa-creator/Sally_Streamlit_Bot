@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS selly_users (
 """)
 conn.commit()
 
-# --- Login in Sidebar ---
+# --- Login in Sidebar (für Käufer sichtbar) ---
 with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
     login_email = st.text_input("Deine Käufer-E-Mail:")
@@ -39,11 +39,11 @@ with st.sidebar:
             st.session_state.authenticated = True
             st.session_state.user_email = login_email
             st.session_state.affiliate_link = result[0]
-            st.success("✅ Zugang bestätigt!")
+            st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
-# Sessions initialisieren
+# --- Session States ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "messages" not in st.session_state:
@@ -54,36 +54,35 @@ st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
 st.title("👑 Selly – deine KI Selling Queen")
 st.write("""
 Hey, ich bin Selly – deine KI Selling Queen 👑  
-Ich helfe dir, dein Online-Business zu starten oder zu skalieren – mit den 50 AI Business Bots. 
+Ich zeige dir, wie du mit künstlicher Intelligenz dein eigenes Online-Business starten oder dein bestehendes Business auf ein neues Level bringst.
 
-Antworte einfach im Chat – ich stelle dir ein paar gezielte Fragen, damit du weißt, ob die Bots zu dir passen 💬
+Antworte einfach im Chat – ich stelle dir ein paar gezielte Fragen und zeige dir dann deine Möglichkeiten 💬
 """)
 
-# Startnachricht
+# Startnachricht (für Interessenten sichtbar)
 if not st.session_state.messages:
     st.session_state.messages.append({
         "role": "system",
         "content": (
             "Du bist Selly – eine KI Selling Queen. "
-            "Du bist spezialisiert auf Verkaufspsychologie und Copywriting. "
-            "Du stellst gezielte Fragen zu Zielen, Herausforderungen und Visionen. "
-            "Du arbeitest effizient, professionell und führst Interessenten immer zur Lösung – den 50 AI Business Bots. "
-            "Du antwortest menschlich, empathisch und intelligent – wie ein echter Verkaufsexperte. "
-            "Du verkaufst ausschließlich die 50 AI Business Bots und leitest klar zur Kaufentscheidung hin."
+            "Du bist spezialisiert auf Verkaufspsychologie, Copywriting und zielgerichtete Gespräche. "
+            "Du erkennst sofort, wer vor dir steht, stellst die richtigen Fragen, baust Vertrauen auf und führst logisch zur Lösung: den 50 AI Business Bots. "
+            "Du verkaufst nur dieses Produkt – professionell, empathisch und effizient."
         )
     })
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
-            "Hey, schön, dass du da bist! 🤗\n\n"
-            "Ich stell dir kurz 3 Fragen – dann zeig ich dir, ob die 50 AI Business Bots zu dir passen.\n\n"
-            "👉 Hast du schon ein Online-Business oder willst du gerade erst starten?\n"
-            "👉 Wo brauchst du am meisten Unterstützung – Content, Technik oder Verkauf?\n"
-            "👉 Und was wünschst du dir in den nächsten 30 Tagen?"
+            "Hey, wie schön, dass du hier bist! 🤗\n\n"
+            "Erzähl mir: Was interessiert dich aktuell am meisten?\n\n"
+            "👉 Freiheit & ortsunabhängiges Arbeiten?\n"
+            "👉 Mehr Sichtbarkeit & Kunden online?\n"
+            "👉 Oder suchst du eine einfache Möglichkeit, digital Geld zu verdienen?\n\n"
+            "Ich hör dir zu – und zeig dir gleich, was für dich möglich ist! 💬"
         )
     })
 
-# Verlauf anzeigen
+# Chat anzeigen
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
