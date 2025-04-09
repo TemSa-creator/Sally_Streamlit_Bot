@@ -84,16 +84,13 @@ if len(st.session_state.messages) == 1:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
-            "Hey 🤍 Schön, dass du da bist!"
-
-Darf ich dir kurz 1 Frage stellen? 🙋‍♀️
-Was wünschst du dir gerade am meisten:
-
-✨ Freiheit & Zeit für dich?
-📲 Kunden, die zu dir kommen – ohne Druck?
-💸 Oder ein Business, das auch läuft, wenn du nicht online bist?
-
-Erzähl’s mir – ich hör dir zu 💬"
+            "Hey 🤍 Schön, dass du da bist!\n\n"
+            "Darf ich dir kurz 1 Frage stellen? 🙋‍♀️\n"
+            "Was wünschst du dir gerade am meisten:\n\n"
+            "✨ Freiheit & Zeit für dich?\n"
+            "📲 Kunden, die zu dir kommen – ohne Druck?\n"
+            "💸 Oder ein Business, das auch läuft, wenn du nicht online bist?\n\n"
+            "Erzähl’s mir – ich hör dir zu 💬"
         )
     })
 
