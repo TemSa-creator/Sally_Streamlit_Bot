@@ -19,6 +19,12 @@ demo_email = "saraharchan@gmail.com"
 c.execute("INSERT OR IGNORE INTO allowed_emails (email) VALUES (?)", (demo_email,))
 conn.commit()
 
+# --- Session vorbereiten ---
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
 # --- Login Sidebar ---
 with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
@@ -29,16 +35,9 @@ with st.sidebar:
             st.session_state.authenticated = True
             st.session_state.user_email = login_email
             st.success("Zugang bestätigt!")
-            st.experimental_rerun()
         else:
             st.error("Zugang verweigert – bitte nur für Käufer.")
             st.stop()
-
-# --- Initialisierungen ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
 # --- Öffentliche Begrüßung ---
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
@@ -51,12 +50,12 @@ Ich stelle dir ein paar Fragen – und zeige dir dann, ob & wie die **50 AI Busi
 Antworte einfach im Chat! 💬
 """)
 
-# --- Nur wenn eingeloggt → Chat aktivieren ---
+# --- GPT & Chatbereich nur für Käufer aktivieren ---
 if st.session_state.authenticated:
 
     openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-    if not st.session_state.messages:
+    if len(st.session_state.messages) == 0:
         st.session_state.messages = [
             {"role": "system", "content": (
                 "Du bist Selly, eine empathische Verkaufs-KI. "
@@ -74,7 +73,7 @@ if st.session_state.authenticated:
             )}
         ]
 
-    # Chat anzeigen
+    # Chatverlauf anzeigen
     for msg in st.session_state.messages:
         if msg["role"] == "system":
             continue
@@ -102,7 +101,7 @@ if st.session_state.authenticated:
         with st.chat_message("assistant"):
             st.markdown(bot_reply)
 
-        # Lead-Erkennung per Mail
+        # Leads automatisch speichern
         email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', user_input)
         if email_match:
             lead_email = email_match.group(0)
