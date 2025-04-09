@@ -64,8 +64,14 @@ if st.session_state.authenticated:
                 "Du stellst Fragen, erkennst Ziele und präsentierst eine Lösung. "
                 "Antworte menschlich, professionell und verkaufspsychologisch clever."
             )},
-          # keine initiale Begrüßung mehr, da sie oben im Layout steht
-
+         {"role": "assistant", "content": (
+    "Hey, schön, dass du da bist! 😊\n\n"
+    "Bevor ich dir zeige, wie du mit den 50 AI Business Bots starten kannst, erzähl mir ein bisschen was über dich:\n\n"
+    "👉 Hast du schon ein Online-Business oder fängst du ganz neu an?\n"
+    "👉 Was ist aktuell deine größte Herausforderung – Content, Reichweite oder Verkauf?\n"
+    "👉 Und was wünschst du dir in den nächsten 30 Tagen für dein Business?\n\n"
+    "Ich hör zu – schreib einfach drauf los 💬"
+)}
         ]
 
     # Chatverlauf anzeigen
