@@ -96,7 +96,7 @@ if "system_message_added" not in st.session_state:
 if len(st.session_state.messages) == 1:
     selly_intro = (
         f"Hey 🤍 Schön, dass du da bist!\n\n"
-        f"Ich bin Selly – und heute ganz persönlich **im Auftrag von Affiliate-ID: `{st.session_state.tentary_id}`** für dich da. 😍\n\n"
+        f"Ich bin Selly – und heute ganz persönlich **im Auftrag von Sarah** für dich da. 😍\n\n"
         f"Darf ich dir kurz 1 Frage stellen? 🙋‍♀️\n"
         f"Was wünschst du dir gerade am meisten:\n\n"
         f"✨ Freiheit & Zeit für dich?\n"
