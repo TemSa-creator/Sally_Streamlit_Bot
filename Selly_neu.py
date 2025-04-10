@@ -24,6 +24,16 @@ def get_connection():
 conn = get_connection()
 cursor = conn.cursor()
 
+# Tabelle anlegen (nur beim ersten Mal)
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS selly_users (
+    email TEXT PRIMARY KEY,
+    affiliate_link TEXT NOT NULL,
+    tentary_id TEXT
+)
+""")
+conn.commit()
+
 # --- Login in Sidebar (für Käufer sichtbar) ---
 with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
@@ -35,7 +45,7 @@ with st.sidebar:
             st.session_state.authenticated = True
             st.session_state.user_email = login_email
             st.session_state.affiliate_link = result[0]
-            st.session_state.tentary_id = result[1]
+            st.session_state.tentary_id = result[1] if result[1] else ""
             st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
@@ -80,17 +90,19 @@ if "system_message_added" not in st.session_state:
 
 # Begrüßung (nur wenn noch keine Nachrichten vorhanden sind)
 if len(st.session_state.messages) == 1:
+    selly_intro = (
+        f"Hey 🤍 Schön, dass du da bist!\n\n"
+        f"Ich bin Selly – und heute ganz persönlich **im Auftrag von {st.session_state.user_email if st.session_state.authenticated else 'meiner Auftraggeberin'}** für dich da. 😍\n\n"
+        f"Darf ich dir kurz 1 Frage stellen? 🙋‍♀️\n"
+        f"Was wünschst du dir gerade am meisten:\n\n"
+        f"✨ Freiheit & Zeit für dich?\n"
+        f"📲 Kunden, die zu dir kommen – ohne Druck?\n"
+        f"💸 Oder ein Business, das auch läuft, wenn du nicht online bist?\n\n"
+        f"Erzähl’s mir – ich hör dir zu 💬"
+    )
     st.session_state.messages.append({
         "role": "assistant",
-        "content": (
-            "Hey 🤍 Schön, dass du da bist!\n\n"
-            "Darf ich dir kurz 1 Frage stellen? 🙋‍♀️\n"
-            "Was wünschst du dir gerade am meisten:\n\n"
-            "✨ Freiheit & Zeit für dich?\n"
-            "📲 Kunden, die zu dir kommen – ohne Druck?\n"
-            "💸 Oder ein Business, das auch läuft, wenn du nicht online bist?\n\n"
-            "Erzähl’s mir – ich hör dir zu 💬"
-        )
+        "content": selly_intro
     })
 
 # Chat anzeigen
@@ -128,14 +140,9 @@ if user_input:
         lead_email = email_match.group(0)
         st.success(f"🎉 Danke für deine Nachricht, {lead_email}!")
         if st.session_state.authenticated:
-            st.markdown(f"👉 **Hier ist dein persönlicher Link:** [Jetzt starten]({st.session_state.affiliate_link})")
+            user_selly_url = f"https://selly-bot.onrender.com?a={st.session_state.tentary_id}"
+            st.markdown(f"👉 **Hier ist dein persönlicher Selly-Link:** [Zu deiner Selly]({user_selly_url})")
         else:
             st.markdown("👉 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
-
-# --- Affiliate-Selly-Link anzeigen ---
-if st.session_state.authenticated and "tentary_id" in st.session_state and st.session_state.tentary_id:
-    selly_link = f"https://selly-bot.onrender.com?ref={st.session_state.tentary_id}"
-    st.markdown("🔗 **Dein persönlicher Selly-Link zum Teilen:**")
-    st.code(selly_link)
 
 conn.close()
