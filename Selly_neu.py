@@ -50,6 +50,10 @@ with st.sidebar:
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
+    # --- Rechtlicher Hinweis unten links ---
+    st.markdown("---")
+    st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
+
 # --- Session States ---
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -82,7 +86,7 @@ if "system_message_added" not in st.session_state:
             " Erwähne, dass es ein Affiliate-Programm gibt mit 50% Provision pro Verkauf."
             " Bonus-Goodies wie Handys oder Tablets können regelmäßig dazukommen – je nach Aktion."
             " Es gibt eine tolle Telegram-Community für Support & Austausch."
-            " Wenn ein Nutzer skeptisch ist oder sagt ‚das ist nichts für mich‘, frage empathisch nach, was genau ihn zweifeln lässt, höre zu und gehe auf Einwände professionell ein."
+            " Wenn ein Nutzer skeptisch ist oder sagt „🤔 das ist nichts für mich“, frage empathisch nach, was genau ihn zweifeln lässt, höre zu und gehe auf Einwände professionell ein."
             " Du gibst nie vorschnell auf. Wer fragt, der führt."
         )
     })
@@ -92,7 +96,7 @@ if "system_message_added" not in st.session_state:
 if len(st.session_state.messages) == 1:
     selly_intro = (
         f"Hey 🤍 Schön, dass du da bist!\n\n"
-        f"Ich bin Selly – und heute ganz persönlich **im Auftrag von {st.session_state.user_email if st.session_state.authenticated else 'meiner Auftraggeberin'}** für dich da. 😍\n\n"
+        f"Ich bin Selly – und heute ganz persönlich **im Auftrag von Affiliate-ID: `{st.session_state.tentary_id}`** für dich da. 😍\n\n"
         f"Darf ich dir kurz 1 Frage stellen? 🙋‍♀️\n"
         f"Was wünschst du dir gerade am meisten:\n\n"
         f"✨ Freiheit & Zeit für dich?\n"
@@ -141,8 +145,8 @@ if user_input:
         st.success(f"🎉 Danke für deine Nachricht, {lead_email}!")
         if st.session_state.authenticated:
             user_selly_url = f"https://selly-bot.onrender.com?a={st.session_state.tentary_id}"
-            st.markdown(f"👉 **Hier ist dein persönlicher Selly-Link:** [Zu deiner Selly]({user_selly_url})")
+            st.markdown(f"🔗 **Hier ist dein persönlicher Selly-Link:** [Zu deiner Selly]({user_selly_url})")
         else:
-            st.markdown("👉 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
+            st.markdown("🔗 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
 
 conn.close()
