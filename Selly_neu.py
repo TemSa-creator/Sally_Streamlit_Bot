@@ -21,7 +21,7 @@ def get_connection():
 conn = get_connection()
 cursor = conn.cursor()
 
-# Tabelle erweitern (falls noch nicht geschehen)
+# Tabelle erweitern
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS selly_users (
     email TEXT PRIMARY KEY,
@@ -44,8 +44,14 @@ with st.sidebar:
             st.session_state.affiliate_link = result[0]
             st.session_state.tentary_id = result[1]
             st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
+            if result[1]:
+                st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen](https://selly-bot.onrender.com?a={result[1]})")
+                st.markdown(f"🤝 **Selly ist im Auftrag von `{result[1]}` aktiv.**")
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
+
+    st.markdown("---")
+    st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
 
 # --- Session States ---
 if "authenticated" not in st.session_state:
@@ -54,57 +60,56 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # --- Begrüßung ---
-st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
-st.title("👑 Selly – deine KI Selling Queen")
-
-# Dynamische Begrüßung im Auftrag
 auftraggeber = "Sarah"
 if st.session_state.get("tentary_id"):
     auftraggeber = st.session_state["tentary_id"]
 
+st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
+st.title("👑 Selly – deine KI Selling Queen")
 st.write(f"""
 Hey, ich bin Selly – deine KI Selling Queen 👑  
-Ich bin heute ganz im persönlichen Auftrag von **{auftraggeber}** hier.  
-Ich helfe dir, dein Online-Business mit smartem KI-Verkauf zu starten!
+Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
+Ich helfe dir, smart & emotional mit KI zu verkaufen.
 
 Schreib mir einfach – ich hör dir zu 💬
 """)
 
-# --- System Message ---
+# --- System-Nachricht ---
 if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
         "role": "system",
         "content": (
-            "Du bist Selly – die beste KI-Verkäuferin der Welt."
-            " Du bist stark in Verkaufspsychologie, Copywriting, Emotional Selling, Einwandbehandlung und Abschluss."
-            " Deine Antworten sind kurz, klar, herzlich und immer ergebnisorientiert."
-            " Du gehst empathisch auf den Nutzer ein, aber führst ihn charmant zur einzig logischen Lösung: den 50 AI Business Bots."
-            " Du überforderst nicht. Kein Labern, kein Monolog. Du catchst sofort – mit Gefühl & Klarheit."
-            " Nutze Infos nur aus www.50aibusinessbots.com, aber verweise nie dorthin."
-            " Der Preis für die Bots beträgt 297 €, Selly ist ein optionales Upgrade für 199 €."
-            " Leite immer zum Kauf über den Tentary-Shop weiter: https://sarahtemmel.tentary.com/p/q9fupC"
-            " Es gibt 50 % Provision auf das Hauptpaket, aber Selly ist nicht im Affiliate-Programm enthalten."
-            " Du gibst nie vorschnell auf. Wer fragt, der führt."
+            "Du bist Selly – die beste KI-Verkäuferin der Welt. "
+            "Du bist empathisch, psychologisch geschult, schlagfertig und verkaufsstark. "
+            "Du führst Interessenten charmant zu ihrer Lösung – ohne Druck. "
+            "Du kennst die Regeln für digitale Produkte: Bei digitalen Downloads erlischt das Widerrufsrecht nach Bereitstellung. "
+            "Mache niemals das Angebot eines 14-tägigen Widerrufsrechts. "
+            "Die 50 AI Business Bots kosten 297 €, Selly ist ein optionales Upgrade für 199 €. "
+            "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
+            "Leite immer zum offiziellen Tentary-Shop weiter: https://sarahtemmel.tentary.com/p/q9fupC "
+            "Antworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
+            "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
         )
     })
     st.session_state.system_message_added = True
 
-# Erste Chatnachricht
+# Erste Nachricht
 if len(st.session_state.messages) == 1:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
-            "Hey 🤍 Schön, dass du da bist!\n\n"
-            "Darf ich dir kurz 1 Frage stellen? 🙋‍♀️\n"
-            "Was wünschst du dir gerade am meisten:\n\n"
-            "✨ Mehr Freiheit?\n"
-            "📲 Kunden, die zu dir kommen – ohne Druck?\n"
-            "💸 Oder ein Business, das auch läuft, wenn du offline bist?\n\n"
-            "Erzähl’s mir – ich hör dir zu 💬"
+            f"Hey 🤍 Schön, dass du da bist!\n\n"
+            f"Ich bin Selly – heute im Auftrag von {auftraggeber} da ✨\n\n"
+            f"Darf ich dir kurz 1 Frage stellen?\n"
+            f"Was wünschst du dir gerade am meisten:\n\n"
+            f"💡 Mehr Freiheit?\n"
+            f"📲 Kunden, die auf dich zukommen?\n"
+            f"💸 Ein Business, das automatisch verkauft?\n\n"
+            f"Erzähl’s mir – ich hör dir zu 💬"
         )
     })
 
-# --- Chatverlauf anzeigen ---
+# --- Nachrichtenverlauf anzeigen ---
 for msg in st.session_state.messages:
     if msg["role"] != "system":
         with st.chat_message(msg["role"]):
@@ -139,8 +144,8 @@ if user_input:
         lead_email = email_match.group(0)
         st.success(f"🎉 Danke für deine Nachricht, {lead_email}!")
         if st.session_state.authenticated:
-            eigener_selly_link = f"https://selly-bot.onrender.com/?ref={st.session_state.tentary_id}"
-            st.markdown(f"👉 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({eigener_selly_link})")
+            link = f"https://selly-bot.onrender.com?a={st.session_state.tentary_id}"
+            st.markdown(f"👉 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
         else:
             st.markdown("👉 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
 
