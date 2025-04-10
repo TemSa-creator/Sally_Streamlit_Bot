@@ -47,6 +47,13 @@ with st.sidebar:
             st.session_state.affiliate_link = result[0]
             st.session_state.tentary_id = result[1] if result[1] else ""
             st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
+            # Persönlicher Selly-Link anzeigen
+            if st.session_state.tentary_id:
+                personal_selly_link = f"https://selly-bot.onrender.com?a={st.session_state.tentary_id}"
+                st.markdown(f"\n👑 **Selly ist jetzt in deinem Namen aktiv – ID: `{st.session_state.tentary_id}`**")
+                st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Hier klicken]({personal_selly_link})")
+            else:
+                st.markdown("⚠️ Du hast noch keine Tentary ID hinterlegt.")
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
@@ -94,9 +101,13 @@ if "system_message_added" not in st.session_state:
 
 # Begrüßung (nur wenn noch keine Nachrichten vorhanden sind)
 if len(st.session_state.messages) == 1:
+    intro_affiliate = "Sarah"
+    if st.session_state.authenticated and st.session_state.tentary_id:
+        intro_affiliate = st.session_state.tentary_id
+
     selly_intro = (
         f"Hey 🤍 Schön, dass du da bist!\n\n"
-        f"Ich bin Selly – und heute ganz persönlich **im Auftrag von Sarah** für dich da. 😍\n\n"
+        f"Ich bin Selly – und heute ganz persönlich **im Auftrag von {intro_affiliate}** für dich da. 😍\n\n"
         f"Darf ich dir kurz 1 Frage stellen? 🙋‍♀️\n"
         f"Was wünschst du dir gerade am meisten:\n\n"
         f"✨ Freiheit & Zeit für dich?\n"
