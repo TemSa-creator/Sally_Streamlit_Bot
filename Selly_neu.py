@@ -24,26 +24,18 @@ def get_connection():
 conn = get_connection()
 cursor = conn.cursor()
 
-# Tabelle anlegen (nur beim ersten Mal)
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS selly_users (
-    email TEXT PRIMARY KEY,
-    affiliate_link TEXT NOT NULL
-)
-""")
-conn.commit()
-
 # --- Login in Sidebar (für Käufer sichtbar) ---
 with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
     login_email = st.text_input("Deine Käufer-E-Mail:")
     if st.button("Login"):
-        cursor.execute("SELECT affiliate_link FROM selly_users WHERE email = %s", (login_email,))
+        cursor.execute("SELECT affiliate_link, tentary_id FROM selly_users WHERE email = %s", (login_email,))
         result = cursor.fetchone()
         if result:
             st.session_state.authenticated = True
             st.session_state.user_email = login_email
             st.session_state.affiliate_link = result[0]
+            st.session_state.tentary_id = result[1]
             st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
@@ -139,5 +131,11 @@ if user_input:
             st.markdown(f"👉 **Hier ist dein persönlicher Link:** [Jetzt starten]({st.session_state.affiliate_link})")
         else:
             st.markdown("👉 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
+
+# --- Affiliate-Selly-Link anzeigen ---
+if st.session_state.authenticated and "tentary_id" in st.session_state and st.session_state.tentary_id:
+    selly_link = f"https://selly-bot.onrender.com?ref={st.session_state.tentary_id}"
+    st.markdown("🔗 **Dein persönlicher Selly-Link zum Teilen:**")
+    st.code(selly_link)
 
 conn.close()
