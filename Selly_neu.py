@@ -3,6 +3,7 @@ import openai
 from openai import OpenAI
 import psycopg2
 import re
+import os  # Wichtig für Umgebungsvariablen
 
 # --- Muss ganz oben stehen: Seiteneinstellungen ---
 st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
@@ -14,10 +15,10 @@ st.write("🚀 Neue Version geladen!")
 # --- PostgreSQL-Verbindung ---
 def get_connection():
     return psycopg2.connect(
-        host=st.secrets["DB_HOST"],
-        database=st.secrets["DB_NAME"],
-        user=st.secrets["DB_USER"],
-        password=st.secrets["DB_PASSWORD"]
+        host=os.environ.get("DB_HOST"),
+        database=os.environ.get("DB_NAME"),
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASSWORD")
     )
 
 conn = get_connection()
@@ -115,7 +116,7 @@ if user_input:
         st.markdown(user_input)
 
     try:
-        client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         response = client.chat.completions.create(
             model="gpt-4",
             messages=st.session_state.messages,
