@@ -21,15 +21,31 @@ def get_connection():
 conn = get_connection()
 cursor = conn.cursor()
 
-# Tabelle erweitern
+# Tabelle erstellen, falls nicht vorhanden
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS selly_users (
     email TEXT PRIMARY KEY,
     affiliate_link TEXT NOT NULL,
-    tentary_id TEXT
+    tentary_id TEXT UNIQUE
 )
 """)
 conn.commit()
+
+# --- URL-Parameter auslesen ---
+query_params = st.experimental_get_query_params()
+tentary_id_from_url = query_params.get("a", [None])[0]
+
+# Standardwerte
+auftraggeber = "Sarah"
+affiliate_link = "https://sarahtemmel.tentary.com/p/q9fupC"
+
+# Tentary-ID abgleichen und aus DB laden
+if tentary_id_from_url:
+    cursor.execute("SELECT affiliate_link FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
+    result = cursor.fetchone()
+    if result:
+        affiliate_link = result[0]
+        auftraggeber = tentary_id_from_url
 
 # --- Sidebar Login ---
 with st.sidebar:
@@ -60,10 +76,6 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # --- Begrüßung ---
-auftraggeber = "Sarah"
-if st.session_state.get("tentary_id"):
-    auftraggeber = st.session_state["tentary_id"]
-
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
 st.title("👑 Selly – deine KI Selling Queen")
 st.write(f"""
@@ -86,7 +98,7 @@ if "system_message_added" not in st.session_state:
             "Mache niemals das Angebot eines 14-tägigen Widerrufsrechts. "
             "Die 50 AI Business Bots kosten 297 €, Selly ist ein optionales Upgrade für 199 €. "
             "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
-            "Leite immer zum offiziellen Tentary-Shop weiter: https://sarahtemmel.tentary.com/p/q9fupC "
+            f"Leite immer zum offiziellen Tentary-Shop weiter: {affiliate_link} "
             "Antworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
             "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
         )
@@ -145,8 +157,8 @@ if user_input:
         st.success(f"🎉 Danke für deine Nachricht, {lead_email}!")
         if st.session_state.authenticated:
             link = f"https://selly-bot.onrender.com?a={st.session_state.tentary_id}"
-            st.markdown(f"👉 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
+            st.markdown(f"🔗 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
         else:
-            st.markdown("👉 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
+            st.markdown("🔗 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
 
 conn.close()
