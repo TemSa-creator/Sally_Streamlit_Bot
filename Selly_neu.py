@@ -41,7 +41,12 @@ if "messages" not in st.session_state:
 query_params = st.query_params
 tentary_id_from_url = query_params.get("a", [None])[0]
 
-# Wenn Tentary-ID in URL → in Session speichern (immer neu!)
+# Einmaliges Reload erzwingen, wenn Affiliate-Link erkannt wurde
+if tentary_id_from_url and "reloaded" not in st.session_state:
+    st.session_state["reloaded"] = True
+    st.experimental_rerun()
+
+# Wenn Tentary-ID in URL → in Session speichern
 if tentary_id_from_url:
     cursor.execute("SELECT affiliate_link FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
     result = cursor.fetchone()
@@ -81,7 +86,7 @@ with st.sidebar:
     st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
 
 # --- Begrüßung & Systemtext dynamisch setzen ---
-if "system_message_added" not in st.session_state and affiliate_link:
+if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
         "role": "system",
         "content": (
