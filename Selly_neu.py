@@ -77,11 +77,7 @@ with st.sidebar:
             st.session_state.affiliate_link = result[0]
             st.session_state.tentary_id = result[1]
             st.session_state.tentary_loaded = True
-            selly_link = f"https://selly-bot.onrender.com?a={result[1]}"
-            st.success("✅ Zugang bestätigt! Du wirst jetzt zu deinem persönlichen Selly-Link weitergeleitet.")
-            st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt öffnen]({selly_link})")
-            js = f"window.open('{selly_link}','_blank')"
-            st.components.v1.html(f"<script>{js}</script>", height=0)
+            st.rerun()
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
