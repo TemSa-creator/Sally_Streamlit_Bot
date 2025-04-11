@@ -94,8 +94,6 @@ Hey, ich bin Selly – deine KI Selling Queen 👑
 Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
 Ich helfe dir, smart & emotional mit KI zu verkaufen.
 
-Du kannst die 50 AI Business Bots direkt über diesen Link holen: [Zum Angebot]({affiliate_link}) 💸
-
 Schreib mir einfach – ich hör dir zu 💬
 """)
 else:
