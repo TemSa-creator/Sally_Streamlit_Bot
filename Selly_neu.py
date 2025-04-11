@@ -31,6 +31,12 @@ CREATE TABLE IF NOT EXISTS selly_users (
 """)
 conn.commit()
 
+# --- Session States ---
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
 # --- URL-Parameter auslesen ---
 query_params = st.query_params
 tentary_id_from_url = query_params.get("a", [None])[0]
@@ -44,8 +50,13 @@ if tentary_id_from_url:
         st.session_state["affiliate_link"] = result[0]
 
 # Session fallback setzen, falls nichts geladen wurde
-auftraggeber = st.session_state.get("tentary_id", "Sarah")
-affiliate_link = st.session_state.get("affiliate_link", "https://sarahtemmel.tentary.com/p/q9fupC")
+if "tentary_id" not in st.session_state:
+    st.session_state["tentary_id"] = "Sarah"
+if "affiliate_link" not in st.session_state:
+    st.session_state["affiliate_link"] = "https://sarahtemmel.tentary.com/p/q9fupC"
+
+auftraggeber = st.session_state["tentary_id"]
+affiliate_link = st.session_state["affiliate_link"]
 
 # --- Sidebar Login ---
 with st.sidebar:
@@ -68,12 +79,6 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
-
-# --- Session States ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
 # --- Begrüßung ---
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
@@ -105,8 +110,8 @@ if "system_message_added" not in st.session_state:
     })
     st.session_state.system_message_added = True
 
-# Erste Nachricht
-if len(st.session_state.messages) == 1:
+# Erste Nachricht NUR wenn Begrüßung noch nicht gesetzt wurde
+if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
