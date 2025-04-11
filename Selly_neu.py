@@ -43,7 +43,7 @@ if tentary_id_from_url:
         st.session_state["tentary_id"] = tentary_id_from_url
         st.session_state["affiliate_link"] = result[0]
 
-# Jetzt aus session_state oder Fallback
+# Session fallback setzen, falls nichts geladen wurde
 auftraggeber = st.session_state.get("tentary_id", "Sarah")
 affiliate_link = st.session_state.get("affiliate_link", "https://sarahtemmel.tentary.com/p/q9fupC")
 
