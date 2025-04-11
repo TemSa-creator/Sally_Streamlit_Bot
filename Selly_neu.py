@@ -35,15 +35,15 @@ conn.commit()
 query_params = st.query_params
 tentary_id_from_url = query_params.get("a", [None])[0]
 
-# Wenn Tentary-ID in URL → in Session speichern
-if tentary_id_from_url and "affiliate_link" not in st.session_state:
+# Wenn Tentary-ID in URL → in Session speichern (immer neu!)
+if tentary_id_from_url:
     cursor.execute("SELECT affiliate_link FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
     result = cursor.fetchone()
     if result:
-        st.session_state.affiliate_link = result[0]
-        st.session_state.tentary_id = tentary_id_from_url
+        st.session_state["tentary_id"] = tentary_id_from_url
+        st.session_state["affiliate_link"] = result[0]
 
-# Danach immer aus session_state verwenden:
+# Jetzt aus session_state oder Fallback
 auftraggeber = st.session_state.get("tentary_id", "Sarah")
 affiliate_link = st.session_state.get("affiliate_link", "https://sarahtemmel.tentary.com/p/q9fupC")
 
