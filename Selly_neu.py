@@ -47,7 +47,7 @@ query_params = st.experimental_get_query_params()
 tentary_id_from_url = query_params.get("a", [None])[0]
 
 # Wenn Tentary-ID in URL → in Session speichern
-if tentary_id_from_url and not st.session_state.tentary_loaded:
+if tentary_id_from_url:
     cursor.execute("SELECT affiliate_link FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
     result = cursor.fetchone()
     if result:
@@ -77,7 +77,8 @@ with st.sidebar:
             st.session_state.affiliate_link = result[0]
             st.session_state.tentary_id = result[1]
             st.session_state.tentary_loaded = True
-            st.rerun()
+            st.success("✅ Zugang bestätigt! Selly verkauft jetzt mit deinem Link.")
+            st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen](https://selly-bot.onrender.com?a={result[1]})")
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
