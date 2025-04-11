@@ -43,7 +43,7 @@ if "system_message_added" not in st.session_state:
     st.session_state.system_message_added = False
 
 # --- URL-Parameter auslesen ---
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 tentary_id_from_url = query_params.get("a", [None])[0]
 
 # Wenn Tentary-ID in URL → in Session speichern
