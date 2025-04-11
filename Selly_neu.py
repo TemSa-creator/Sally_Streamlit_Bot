@@ -36,21 +36,18 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "messages" not in st.session_state:
     st.session_state.messages = []
-if "tentary_loaded" not in st.session_state:
-    st.session_state.tentary_loaded = False
 
 # --- URL-Parameter auslesen ---
 query_params = st.query_params
 tentary_id_from_url = query_params.get("a", [None])[0]
 
-# Wenn Tentary-ID in URL → in Session speichern
-if tentary_id_from_url and not st.session_state.tentary_loaded:
+# Wenn Tentary-ID in URL → in Session speichern (immer neu!)
+if tentary_id_from_url:
     cursor.execute("SELECT affiliate_link FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
     result = cursor.fetchone()
     if result:
         st.session_state["tentary_id"] = tentary_id_from_url
         st.session_state["affiliate_link"] = result[0]
-        st.session_state.tentary_loaded = True
 
 # Session fallback setzen, falls nichts geladen wurde
 if "tentary_id" not in st.session_state:
@@ -73,7 +70,6 @@ with st.sidebar:
             st.session_state.user_email = login_email
             st.session_state.affiliate_link = result[0]
             st.session_state.tentary_id = result[1]
-            st.session_state.tentary_loaded = True
             st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
             if result[1]:
                 st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen](https://selly-bot.onrender.com?a={result[1]})")
@@ -84,23 +80,8 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
 
-# --- Begrüßungstitel anzeigen ---
-st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
-st.title("👑 Selly – deine KI Selling Queen")
-
-if auftraggeber != "Sarah":
-    st.write(f"""
-Hey, ich bin Selly – deine KI Selling Queen 👑  
-Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
-Ich helfe dir, smart & emotional mit KI zu verkaufen.
-
-Schreib mir einfach – ich hör dir zu 💬
-""")
-else:
-    st.write("Hey, ich bin Selly – deine KI Selling Queen 👑")
-
-# --- Begrüßung & Systemtext nur wenn tentary geladen wurde und NICHT Sarah ---
-if "system_message_added" not in st.session_state and auftraggeber != "Sarah":
+# --- Begrüßung & Systemtext dynamisch setzen ---
+if "system_message_added" not in st.session_state and affiliate_link:
     st.session_state.messages.append({
         "role": "system",
         "content": (
@@ -118,7 +99,7 @@ if "system_message_added" not in st.session_state and auftraggeber != "Sarah":
     })
     st.session_state.system_message_added = True
 
-if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0 and auftraggeber != "Sarah":
+if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
@@ -132,6 +113,17 @@ if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"])
             f"Erzähl’s mir – ich hör dir zu 💬"
         )
     })
+
+# --- Begrüßungstitel anzeigen ---
+st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
+st.title("👑 Selly – deine KI Selling Queen")
+st.write(f"""
+Hey, ich bin Selly – deine KI Selling Queen 👑  
+Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
+Ich helfe dir, smart & emotional mit KI zu verkaufen.
+
+Schreib mir einfach – ich hör dir zu 💬
+""")
 
 # --- Nachrichtenverlauf anzeigen ---
 for msg in st.session_state.messages:
