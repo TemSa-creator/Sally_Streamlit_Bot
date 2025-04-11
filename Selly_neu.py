@@ -80,19 +80,8 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
 
-# --- Begrüßung ---
-st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
-st.title("👑 Selly – deine KI Selling Queen")
-st.write(f"""
-Hey, ich bin Selly – deine KI Selling Queen 👑  
-Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
-Ich helfe dir, smart & emotional mit KI zu verkaufen.
-
-Schreib mir einfach – ich hör dir zu 💬
-""")
-
-# --- System-Nachricht ---
-if "system_message_added" not in st.session_state:
+# --- Begrüßung & Systemtext dynamisch setzen ---
+if "system_message_added" not in st.session_state and affiliate_link:
     st.session_state.messages.append({
         "role": "system",
         "content": (
@@ -110,7 +99,6 @@ if "system_message_added" not in st.session_state:
     })
     st.session_state.system_message_added = True
 
-# Erste Nachricht NUR wenn Begrüßung noch nicht gesetzt wurde
 if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
     st.session_state.messages.append({
         "role": "assistant",
@@ -125,6 +113,17 @@ if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"])
             f"Erzähl’s mir – ich hör dir zu 💬"
         )
     })
+
+# --- Begrüßungstitel anzeigen ---
+st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
+st.title("👑 Selly – deine KI Selling Queen")
+st.write(f"""
+Hey, ich bin Selly – deine KI Selling Queen 👑  
+Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
+Ich helfe dir, smart & emotional mit KI zu verkaufen.
+
+Schreib mir einfach – ich hör dir zu 💬
+""")
 
 # --- Nachrichtenverlauf anzeigen ---
 for msg in st.session_state.messages:
