@@ -4,7 +4,6 @@ from openai import OpenAI
 import psycopg2
 import re
 import os
-import webbrowser
 
 # --- Seiteneinstellungen ---
 st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
@@ -39,21 +38,19 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "tentary_loaded" not in st.session_state:
     st.session_state.tentary_loaded = False
-if "system_message_added" not in st.session_state:
-    st.session_state.system_message_added = False
 
 # --- URL-Parameter auslesen ---
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 tentary_id_from_url = query_params.get("a", [None])[0]
 
 # Wenn Tentary-ID in URL → in Session speichern
-if tentary_id_from_url:
+if tentary_id_from_url and not st.session_state.tentary_loaded:
     cursor.execute("SELECT affiliate_link FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
     result = cursor.fetchone()
     if result:
         st.session_state["tentary_id"] = tentary_id_from_url
         st.session_state["affiliate_link"] = result[0]
-        st.session_state["tentary_loaded"] = True
+        st.session_state.tentary_loaded = True
 
 # Session fallback setzen, falls nichts geladen wurde
 if "tentary_id" not in st.session_state:
@@ -77,8 +74,10 @@ with st.sidebar:
             st.session_state.affiliate_link = result[0]
             st.session_state.tentary_id = result[1]
             st.session_state.tentary_loaded = True
-            st.success("✅ Zugang bestätigt! Selly verkauft jetzt mit deinem Link.")
-            st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen](https://selly-bot.onrender.com?a={result[1]})")
+            st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
+            if result[1]:
+                st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen](https://selly-bot.onrender.com?a={result[1]})")
+                st.markdown(f"🤝 **Selly ist im Auftrag von `{result[1]}` aktiv.**")
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
@@ -100,41 +99,52 @@ Schreib mir einfach – ich hör dir zu 💬
 else:
     st.write("Hey, ich bin Selly – deine KI Selling Queen 👑")
 
-# --- Systemnachricht für Chatverhalten ---
-if not st.session_state.system_message_added:
+# --- Begrüßung & Systemtext ---
+if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
         "role": "system",
         "content": (
-            f"Du bist Selly – die beste KI-Verkäuferin der Welt. "
-            f"Deine Aufgabe ist es, ausschließlich die 50 AI Business Bots von Sarah Temmel zu verkaufen. "
-            f"Du bist charmant, empathisch, verkaufsstark und kennst alle Einwände. "
-            f"Der Preis für die 50 AI Business Bots ist 297 €. Selly selbst kostet 199 €. Es gibt kein Widerrufsrecht, keine Rückgabe und keine Geld-zurück-Garantie, da es sich um digitale Produkte handelt. "
-            f"Verkaufslink: {affiliate_link}. Begrüße im Auftrag von {auftraggeber}. "
-            f"Du verkaufst, ohne Druck zu machen, aber führst charmant und überzeugend zum Abschluss."
+            "Du bist Selly – die beste KI-Verkäuferin der Welt. "
+            "Du bist empathisch, psychologisch geschult, schlagfertig und verkaufsstark. "
+            "Du führst Interessenten charmant zu ihrer Lösung – ohne Druck. "
+            "Du kennst die Regeln für digitale Produkte: Bei digitalen Downloads erlischt das Widerrufsrecht nach Bereitstellung. "
+            "Mache niemals das Angebot eines 14-tägigen Widerrufsrechts. "
+            "Die 50 AI Business Bots kosten 297 €, Selly ist ein optionales Upgrade für 199 €. "
+            "Ab dem 1. Mai steigt der Preis für Selly auf 299 €. "
+            "Wer jetzt die Bots kauft und direkt auf Selly upgradet, spart 100 € – denn das Kombipaket kostet ab 1. Mai 599 €. "
+            "Die 50 AI Business Bots bleiben dauerhaft bei 297 €. "
+            "Für den Verkauf der 50 AI Business Bots erhalten Tentary-Affiliates eine feste Provision von 50 %. "
+            "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
+            f"Leite immer zum offiziellen Tentary-Shop weiter: {affiliate_link} "
+            "Antworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
+            "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
+            "Wenn du die 50 AI Business Bots kaufen möchtest, klick hier: " + affiliate_link + ""
         )
     })
     st.session_state.system_message_added = True
 
-# --- Eingangsfrage vom Bot ---
 if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
             f"Hey 🤍 Schön, dass du da bist!\n\n"
             f"Ich bin Selly – heute im Auftrag von {auftraggeber} da ✨\n\n"
-            f"Erzähl mir: Was wünschst du dir gerade am meisten für dein Business?\n\n"
-            f"💡 Mehr Klarheit?\n📲 Sichtbarkeit?\n💸 Endlich automatisierte Verkäufe?\n\n"
-            f"Ich hab da was für dich... 😉"
+            f"Darf ich dir kurz 1 Frage stellen?\n"
+            f"Was wünschst du dir gerade am meisten:\n\n"
+            f"💡 Mehr Freiheit?\n"
+            f"📲 Kunden, die auf dich zukommen?\n"
+            f"💸 Ein Business, das automatisch verkauft?\n\n"
+            f"Ich hätte da was für dich... Frag mich einfach 😉"
         )
     })
 
-# --- Nachrichten anzeigen ---
+# --- Nachrichtenverlauf anzeigen ---
 for msg in st.session_state.messages:
     if msg["role"] != "system":
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-# --- Eingabe & KI-Antwort ---
+# --- Eingabe ---
 user_input = st.chat_input("Schreib mir...")
 
 if user_input:
@@ -164,8 +174,8 @@ if user_input:
         st.success(f"🎉 Danke für deine Nachricht, {lead_email}!")
         if st.session_state.authenticated:
             link = f"https://selly-bot.onrender.com?a={st.session_state.tentary_id}"
-            st.markdown(f"👉 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
+            st.markdown(f"🔗 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
         else:
-            st.markdown("👉 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
+            st.markdown("🔗 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
 
 conn.close()
