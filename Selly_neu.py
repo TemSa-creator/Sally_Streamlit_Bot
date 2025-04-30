@@ -21,12 +21,21 @@ def get_connection():
 conn = get_connection()
 cursor = conn.cursor()
 
-# Tabelle erstellen, falls nicht vorhanden
+# Tabellen erstellen, falls nicht vorhanden
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS selly_users (
     email TEXT PRIMARY KEY,
     affiliate_link TEXT NOT NULL,
     tentary_id TEXT UNIQUE
+)
+""")
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS selly_tracking (
+    id SERIAL PRIMARY KEY,
+    timestamp TIMESTAMPTZ DEFAULT NOW(),
+    tentary_id TEXT,
+    user_input TEXT,
+    email_erkannt TEXT
 )
 """)
 conn.commit()
@@ -86,18 +95,18 @@ with st.sidebar:
 
 # --- Begrüßungstitel anzeigen ---
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
-st.title("👑 Selly – deine KI Selling Queen")
+st.title("📁 Selly – deine KI Selling Queen")
 
 if auftraggeber != "Sarah":
     st.write(f"""
-Hey, ich bin Selly – deine KI Selling Queen 👑  
+Hey, ich bin Selly – deine KI Selling Queen 📁  
 Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
 Ich helfe dir, smart & emotional mit KI zu verkaufen.
 
 Schreib mir einfach – ich hör dir zu 💬
 """)
 else:
-    st.write("Hey, ich bin Selly – deine KI Selling Queen 👑")
+    st.write("Hey, ich bin Selly – deine KI Selling Queen 📁")
 
 # --- Begrüßung & Systemtext ---
 if "system_message_added" not in st.session_state:
@@ -127,14 +136,14 @@ if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"])
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
-            f"Hey 🤍 Schön, dass du da bist!\n\n"
+            f"Hey 🧰 Schön, dass du da bist!\n\n"
             f"Ich bin Selly – heute im Auftrag von {auftraggeber} da ✨\n\n"
             f"Darf ich dir kurz 1 Frage stellen?\n"
             f"Was wünschst du dir gerade am meisten:\n\n"
             f"💡 Mehr Freiheit?\n"
             f"📲 Kunden, die auf dich zukommen?\n"
             f"💸 Ein Business, das automatisch verkauft?\n\n"
-            f"Ich hätte da was für dich... Frag mich einfach 😉"
+            f"Ich hätte da was für dich... Frag mich einfach ὠ9"
         )
     })
 
@@ -177,5 +186,16 @@ if user_input:
             st.markdown(f"🔗 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
         else:
             st.markdown("🔗 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
+
+    # Tracking speichern
+    cursor.execute("""
+        INSERT INTO selly_tracking (tentary_id, user_input, email_erkannt)
+        VALUES (%s, %s, %s)
+    """, (
+        st.session_state.get("tentary_id", "Unbekannt"),
+        user_input,
+        email_match.group(0) if email_match else None
+    ))
+    conn.commit()
 
 conn.close()
