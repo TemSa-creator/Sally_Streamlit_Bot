@@ -120,16 +120,13 @@ with st.sidebar:
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
 st.title("👑 Selly – deine KI Selling Queen")
 
-if auftraggeber != "Sarah":
-    st.write(f"""
+st.write(f"""
 Hey, ich bin Selly – deine KI Selling Queen 👑  
 Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
 Ich helfe dir, smart & emotional mit KI zu verkaufen.
 
 Schreib mir einfach – ich hör dir zu 💬
 """)
-else:
-    st.write("Hey, ich bin Selly – deine KI Selling Queen 👑")
 
 if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
