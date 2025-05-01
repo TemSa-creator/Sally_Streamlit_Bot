@@ -96,7 +96,7 @@ with st.sidebar:
                 st.session_state.authenticated = True
                 st.session_state.user_email = login_email
                 st.session_state.affiliate_link = result[0]
-                st.session_state.affiliate_link_bundle = result[1]
+                st.session_state.affiliate_link_bundle = result[1] or "https://sarahtemmel.tentary.com/p/e1I0e5"
                 st.session_state.kombipaket_freigegeben = result[2]
                 st.session_state.tentary_id = result[3]
                 st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
@@ -116,7 +116,12 @@ with st.sidebar:
         except Exception as e:
             st.error(f"Fehler beim Login: {e}")
 
-auftraggeber = tentary_id_from_url if tentary_id_from_url else st.session_state.get("tentary_id", "Sarah")
+# --- Auftraggeber korrekt bestimmen ---
+if st.session_state.get("tentary_id") and st.session_state["tentary_id"] != "Sarah":
+    auftraggeber = st.session_state["tentary_id"]
+else:
+    auftraggeber = "Sarah"
+
 affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
 # --- Selly anzeigen ---
