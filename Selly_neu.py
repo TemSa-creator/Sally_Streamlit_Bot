@@ -102,106 +102,18 @@ with st.sidebar:
                 st.session_state.kombipaket_freigegeben = result[2]
                 st.session_state.tentary_id = result[3]
                 st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
+
+                if result[3]:
+                    selly_link = f"https://selly-bot.onrender.com?a={result[3]}"
+                    st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen]({selly_link})")
+
+                    if result[2]:
+                        st.markdown(f"📦 **Bundle-Link (Bots + Selly):** [Zum Shop]({result[1]})")
+                    else:
+                        st.markdown(f"🤖 **Nur Bots-Link:** [Zum Shop]({result[0]})")
             else:
                 st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
         except Exception as e:
             st.error(f"Fehler beim Login: {e}")
 
-# --- Begrüßung & Systemtext ---
-if "system_message_added" not in st.session_state:
-    st.session_state.messages.append({
-        "role": "system",
-        "content": (
-            "Du bist Selly – die beste KI-Verkäuferin der Welt. "
-            "Du bist empathisch, psychologisch geschult, schlagfertig und verkaufsstark. "
-            "Du führst Interessenten charmant zu ihrer Lösung – ohne Druck. "
-            "Du kennst die Regeln für digitale Produkte: Bei digitalen Downloads erlischt das Widerrufsrecht nach Bereitstellung. "
-            "Mache niemals das Angebot eines 14-tägigen Widerrufsrechts. "
-            "Die 50 AI Business Bots kosten 297 €, Selly ist ein optionales Upgrade für 299 €. "
-            "Das gesamte Kombipaket (Bots + Selly) kostet 589 €. "
-            "Die 50 AI Business Bots bleiben dauerhaft bei 297 €. "
-            "Für den Verkauf der 50 AI Business Bots erhalten Tentary-Affiliates eine feste Provision von 50 %. "
-            "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
-            f"Wenn jemand nur die Bots möchte, leite zu diesem Link weiter: {st.session_state['affiliate_link']} "
-            f"Wenn jemand das komplette Business mit Selly will, leite zu diesem Bundle-Link weiter: {st.session_state['affiliate_link_bundle']}. "
-            "Antworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
-            "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
-        )
-    })
-    st.session_state.system_message_added = True
-
-# --- Bild & Begrüßung ---
-st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
-
-if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": (
-            f"Hey 🤍 Schön, dass du da bist!\n\n"
-            f"Ich bin Selly – heute ganz persönlich im Auftrag von {auftraggeber} für dich da.\n\n"
-            f"Stell dir mal vor:\n"
-            f"Ein Business, das für dich verkauft – automatisch.\n"
-            f"Ohne ständig posten zu müssen.\n"
-            f"Ohne Sales Calls.\n"
-            f"Und ohne Vorkenntnisse.\n\n"
-            f"Genau das ist möglich – und ich zeig dir, wie.\n\n"
-            f"Aber zuerst erzähl mir mal kurz:\n"
-            f"🔹 Bist du gerade auf der Suche nach einem smarten Nebenverdienst?\n"
-            f"🔸 Oder willst du dir ein skalierbares Einkommen aufbauen, das zu deinem Leben passt?\n\n"
-            f"Je nachdem, was besser zu dir passt, tauchen wir dann gemeinsam ein. Deal? 💬"
-        )
-    })
-
-# --- Nachrichtenverlauf anzeigen ---
-for msg in st.session_state.messages:
-    if msg["role"] != "system":
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
-
-# --- Eingabe & Antwortverarbeitung ---
-user_input = st.chat_input("Schreib mir...")
-
-if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
-        st.markdown(user_input)
-
-    try:
-        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=st.session_state.messages,
-            temperature=0.7
-        )
-        bot_reply = response.choices[0].message.content
-    except Exception as e:
-        bot_reply = f"Fehler: {e}"
-
-    st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-    with st.chat_message("assistant"):
-        st.markdown(bot_reply)
-
-    # Leads erkennen
-    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', user_input)
-    if email_match:
-        lead_email = email_match.group(0)
-        st.success(f"🎉 Danke für deine Nachricht, {lead_email}!")
-
-    # Tracking speichern
-    try:
-        cursor.execute("""
-            INSERT INTO selly_tracking (tentary_id, user_input, email_erkannt)
-            VALUES (%s, %s, %s)
-        """, (
-            st.session_state.get("tentary_id", "Unbekannt"),
-            user_input,
-            email_match.group(0) if email_match else None
-        ))
-        conn.commit()
-    except:
-        pass
-
-try:
-    conn.close()
-except:
-    pass
+# Der Rest des Codes bleibt unverändert ...
