@@ -76,7 +76,7 @@ if "kombipaket_freigegeben" not in st.session_state:
     st.session_state["kombipaket_freigegeben"] = False
 
 auftraggeber = st.session_state["tentary_id"]
-affiliate_link = st.session_state["affiliate_link_bundle"] or st.session_state["affiliate_link"]
+affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
 # --- Begrüßung & Systemtext ---
 if "system_message_added" not in st.session_state:
