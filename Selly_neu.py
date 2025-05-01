@@ -51,7 +51,7 @@ if "tentary_loaded" not in st.session_state:
     st.session_state.tentary_loaded = False
 
 # --- URL-Parameter auslesen ---
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 tentary_id_from_url = query_params.get("a", [None])[0]
 
 # Wenn Tentary-ID in URL → in Session speichern
@@ -76,7 +76,7 @@ if "kombipaket_freigegeben" not in st.session_state:
     st.session_state["kombipaket_freigegeben"] = False
 
 auftraggeber = st.session_state["tentary_id"]
-affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state.get("kombipaket_freigegeben") and st.session_state.get("affiliate_link_bundle") else st.session_state["affiliate_link"]
+affiliate_link = st.session_state["affiliate_link_bundle"] or st.session_state["affiliate_link"]
 
 # --- Begrüßung & Systemtext ---
 if "system_message_added" not in st.session_state:
@@ -94,7 +94,7 @@ if "system_message_added" not in st.session_state:
             "Für den Verkauf der 50 AI Business Bots erhalten Tentary-Affiliates eine feste Provision von 50 %. "
             "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
             f"Wenn jemand nur die Bots möchte, leite zu diesem Link weiter: {st.session_state['affiliate_link']} "
-            f"Wenn jemand das komplette Business mit Selly will, leite zu diesem Bundle-Link weiter: {st.session_state['affiliate_link_bundle'] if st.session_state.get('kombipaket_freigegeben') and st.session_state.get('affiliate_link_bundle') else 'nicht verfügbar'} "
+            f"Wenn jemand das komplette Business mit Selly will, leite zu diesem Bundle-Link weiter: {st.session_state['affiliate_link_bundle']} if st.session_state.get('kombipaket_freigegeben') and st.session_state.get('affiliate_link_bundle') else 'nicht verfügbar'} "
             "Antworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
             "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
         )
