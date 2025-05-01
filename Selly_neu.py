@@ -54,7 +54,8 @@ for key, default in {
     "affiliate_link": "https://sarahtemmel.tentary.com/p/q9fupC",
     "affiliate_link_bundle": "https://sarahtemmel.tentary.com/p/e1I0e5",
     "kombipaket_freigegeben": False,
-    "user_email": ""
+    "user_email": "",
+    "begruessung_gesetzt": False
 }.items():
     if key not in st.session_state:
         st.session_state[key] = default
@@ -99,6 +100,7 @@ with st.sidebar:
                 st.session_state.affiliate_link_bundle = result[1] or "https://sarahtemmel.tentary.com/p/e1I0e5"
                 st.session_state.kombipaket_freigegeben = result[2]
                 st.session_state.tentary_id = result[3]
+                st.session_state.tentary_loaded = True
                 st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
 
                 if result[3]:
@@ -117,26 +119,21 @@ with st.sidebar:
             st.error(f"Fehler beim Login: {e}")
 
 # --- Auftraggeber korrekt bestimmen ---
-if st.session_state.get("tentary_id") and st.session_state["tentary_id"] != "Sarah":
-    auftraggeber = st.session_state["tentary_id"]
-else:
-    auftraggeber = "Sarah"
-
+auftraggeber = st.session_state["tentary_id"] if st.session_state.get("tentary_id") else "Sarah"
 affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
 # --- Selly anzeigen ---
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
 st.title("👑 Selly – deine KI Selling Queen")
 
-if "begruessung_gesetzt" not in st.session_state:
-    begruessung = f"""
+if not st.session_state.begruessung_gesetzt:
+    st.write(f"""
     Hey, ich bin Selly – deine KI Selling Queen 👑  
     Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
     Ich helfe dir, smart & emotional mit KI zu verkaufen.
 
     Schreib mir einfach – ich hör dir zu 💬
-    """
-    st.write(begruessung)
+    """)
     st.session_state.begruessung_gesetzt = True
 
 if "system_message_added" not in st.session_state:
