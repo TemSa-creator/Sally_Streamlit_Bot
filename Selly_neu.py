@@ -110,14 +110,12 @@ with st.sidebar:
                     else:
                         st.markdown(f"🤖 **Nur Bots-Link:** [Zum Shop]({result[0]})")
 
-                # Affiliate-Info anzeigen
                 st.markdown(f"👤 Eingeloggt als: `{result[3]}`")
             else:
                 st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
         except Exception as e:
             st.error(f"Fehler beim Login: {e}")
 
-# --- Auftraggeber (nach Login setzen) ---
 auftraggeber = st.session_state.get("tentary_id", "Sarah")
 affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
@@ -125,13 +123,16 @@ affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
 st.title("👑 Selly – deine KI Selling Queen")
 
-st.write(f"""
-Hey, ich bin Selly – deine KI Selling Queen 👑  
-Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
-Ich helfe dir, smart & emotional mit KI zu verkaufen.
+if "begruessung_gesetzt" not in st.session_state:
+    begruessung = f"""
+    Hey, ich bin Selly – deine KI Selling Queen 👑  
+    Heute bin ich ganz persönlich im Auftrag von **{auftraggeber}** für dich da.  
+    Ich helfe dir, smart & emotional mit KI zu verkaufen.
 
-Schreib mir einfach – ich hör dir zu 💬
-""")
+    Schreib mir einfach – ich hör dir zu 💬
+    """
+    st.write(begruessung)
+    st.session_state.begruessung_gesetzt = True
 
 if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
@@ -153,7 +154,6 @@ if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"])
         "role": "assistant",
         "content": (
             f"Hey 🤍 Schön, dass du da bist!\n\n"
-            f"Ich bin Selly – heute ganz persönlich im Auftrag von {auftraggeber} für dich da ✨\n\n"
             f"Stell dir mal vor:\n"
             f"Ein Business, das für dich verkauft – automatisch.\n"
             f"Ohne ständig posten zu müssen.\n"
