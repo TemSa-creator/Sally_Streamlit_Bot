@@ -26,7 +26,8 @@ cursor.execute("""
 CREATE TABLE IF NOT EXISTS selly_users (
     email TEXT PRIMARY KEY,
     affiliate_link TEXT NOT NULL,
-    tentary_id TEXT UNIQUE
+    tentary_id TEXT UNIQUE,
+    affiliate_link_bundle TEXT
 )
 """)
 conn.commit()
@@ -45,11 +46,12 @@ tentary_id_from_url = query_params.get("a", [None])[0]
 
 # Wenn Tentary-ID in URL → in Session speichern
 if tentary_id_from_url and not st.session_state.tentary_loaded:
-    cursor.execute("SELECT affiliate_link FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
+    cursor.execute("SELECT affiliate_link, affiliate_link_bundle FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
     result = cursor.fetchone()
     if result:
         st.session_state["tentary_id"] = tentary_id_from_url
         st.session_state["affiliate_link"] = result[0]
+        st.session_state["affiliate_link_bundle"] = result[1] or "https://sarahtemmel.tentary.com/p/e1I0e5"
         st.session_state.tentary_loaded = True
 
 # Session fallback setzen, falls nichts geladen wurde
@@ -57,22 +59,26 @@ if "tentary_id" not in st.session_state:
     st.session_state["tentary_id"] = "Sarah"
 if "affiliate_link" not in st.session_state:
     st.session_state["affiliate_link"] = "https://sarahtemmel.tentary.com/p/q9fupC"
+if "affiliate_link_bundle" not in st.session_state:
+    st.session_state["affiliate_link_bundle"] = "https://sarahtemmel.tentary.com/p/e1I0e5"
 
 auftraggeber = st.session_state["tentary_id"]
 affiliate_link = st.session_state["affiliate_link"]
+affiliate_link_bundle = st.session_state["affiliate_link_bundle"]
 
 # --- Sidebar Login ---
 with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
     login_email = st.text_input("Deine Käufer-E-Mail:")
     if st.button("Login"):
-        cursor.execute("SELECT affiliate_link, tentary_id FROM selly_users WHERE email = %s", (login_email,))
+        cursor.execute("SELECT affiliate_link, tentary_id, affiliate_link_bundle FROM selly_users WHERE email = %s", (login_email,))
         result = cursor.fetchone()
         if result:
             st.session_state.authenticated = True
             st.session_state.user_email = login_email
             st.session_state.affiliate_link = result[0]
             st.session_state.tentary_id = result[1]
+            st.session_state.affiliate_link_bundle = result[2] or "https://sarahtemmel.tentary.com/p/e1I0e5"
             st.session_state.tentary_loaded = True
             st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
             if result[1]:
@@ -109,15 +115,17 @@ if "system_message_added" not in st.session_state:
             "Du führst Interessenten charmant zu ihrer Lösung – ohne Druck. "
             "Du kennst die Regeln für digitale Produkte: Bei digitalen Downloads erlischt das Widerrufsrecht nach Bereitstellung. "
             "Mache niemals das Angebot eines 14-tägigen Widerrufsrechts. "
-            "Die 50 AI Business Bots kosten 297 €, Selly ist ein optionales Upgrade für 299 €. "
-            "Wer jetzt die Bots kauft im Bundle mit Selly, spart sich bares Geld - denn das Kombipaket kostet nur 589 €. "
+            "Die 50 AI Business Bots kosten 297 €, Selly ist ein optionales Upgrade für 199 €. "
+            "Ab dem 1. Mai steigt der Preis für Selly auf 299 €. "
+            "Wer jetzt die Bots kauft und direkt auf Selly upgradet, spart 100 € – denn das Kombipaket kostet ab 1. Mai 599 €. "
             "Die 50 AI Business Bots bleiben dauerhaft bei 297 €. "
             "Für den Verkauf der 50 AI Business Bots erhalten Tentary-Affiliates eine feste Provision von 50 %. "
-            "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket und als Bundle. "
+            "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
             f"Leite immer zum offiziellen Tentary-Shop weiter: {affiliate_link} "
-            "Antworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
+            f"\n👉 Das Bundle findest du hier: {affiliate_link_bundle} "
+            "\nAntworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
             "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
-            "Wenn du die 50 AI Business Bots kaufen möchtest, klick hier: " + affiliate_link + ""
+            f"Wenn du die 50 AI Business Bots kaufen möchtest, klick hier: {affiliate_link} "
         )
     })
     st.session_state.system_message_added = True
