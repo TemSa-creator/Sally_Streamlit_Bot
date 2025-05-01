@@ -94,7 +94,7 @@ if "system_message_added" not in st.session_state:
             "Für den Verkauf der 50 AI Business Bots erhalten Tentary-Affiliates eine feste Provision von 50 %. "
             "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
             f"Wenn jemand nur die Bots möchte, leite zu diesem Link weiter: {st.session_state['affiliate_link']} "
-            f"Wenn jemand das komplette Business mit Selly will, leite zu diesem Bundle-Link weiter: {st.session_state['affiliate_link_bundle']}. ""
+            f"Wenn jemand das komplette Business mit Selly will, leite zu diesem Bundle-Link weiter: {st.session_state['affiliate_link_bundle']}. "
             "Antworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
             "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
         )
