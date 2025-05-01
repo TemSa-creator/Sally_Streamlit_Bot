@@ -2,6 +2,7 @@ import streamlit as st
 import openai
 import psycopg2
 import os
+from datetime import datetime
 
 # --- Seiteneinstellungen ---
 st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
@@ -55,7 +56,8 @@ def initialize_session():
         "kombipaket_freigegeben": False,
         "anzeige_name": "Sarah",
         "user_email": "",
-        "begruessung_gesetzt": False
+        "begruessung_gesetzt": False,
+        "antwort_status": "offen"
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -146,11 +148,30 @@ if not st.session_state.begruessung_gesetzt:
         🔹 Bist du gerade auf der Suche nach einem smarten Nebenverdienst?  
         🔸 Oder willst du dir ein skalierbares Einkommen aufbauen?
 
-        Je nachdem, was besser zu dir passt, tauchen wir gemeinsam ein 💬
+        Antworte einfach mit "Nebenverdienst" oder "Skalierbar" – dann bekommst du das passende Angebot 💬
     """
 
     st.markdown(begruessung)
     st.session_state.begruessung_gesetzt = True
 
 # Eingabefeld für Chat
-st.text_input("Schreib mir…")
+eingabe = st.text_input("Schreib mir…")
+if eingabe:
+    name = st.session_state.get("anzeige_name", "Sarah")
+    affiliate = st.session_state.get("affiliate_link")
+    bundle = st.session_state.get("affiliate_link_bundle")
+
+    if "nebenverdienst" in eingabe.lower():
+        st.write(f"✨ Perfekt! Dann ist das hier dein nächster Schritt: [Jetzt starten]({affiliate})")
+    elif "skalierbar" in eingabe.lower():
+        st.write(f"🚀 Super! Dann empfehle ich dir unser Bundle: [Hier geht's zum Angebot]({bundle})")
+        try:
+            cursor.execute("""
+                INSERT INTO selly_tracking (tentary_id, user_input, email_erkannt)
+                VALUES (%s, %s, %s)
+            """, (st.session_state.tentary_id, eingabe, st.session_state.user_email))
+            conn.commit()
+        except:
+            pass
+    else:
+        st.write("💬 Danke für deine Nachricht! Schreib einfach weiter, wenn du Fragen hast.")
