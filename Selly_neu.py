@@ -124,13 +124,17 @@ with st.sidebar:
 
 # --- Selly Begrüßung & Chat ---
 if not st.session_state.begruessung_gesetzt:
-    name = st.session_state["tentary_id"]
+    name = st.session_state.get("tentary_id", "Sarah")
     st.image("https://i.postimg.cc/xq1yKCRq/selly-start.png", width=220)
+    if name != "Sarah":
+        begruessung = f"Hey, ich bin Selly – deine KI Selling Queen 👑\n\nHeute bin ich ganz persönlich im Auftrag von **{name}** für dich da."
+    else:
+        begruessung = "Hey, ich bin Selly – deine KI Selling Queen 👑\n\nHeute bin ich ganz persönlich im Auftrag von **Sarah** für dich da."
+
     st.markdown(f"""
         ## 👑 Selly – deine KI Selling Queen
 
-        Hey, ich bin Selly – deine KI Selling Queen 👑  
-        Heute bin ich ganz persönlich im Auftrag von **{name}** für dich da.  
+        {begruessung}  
         Ich helfe dir, smart & emotional mit KI zu verkaufen.
 
         Schreib mir einfach – ich hör dir zu 💬
