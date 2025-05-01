@@ -26,7 +26,8 @@ try:
         affiliate_link TEXT NOT NULL,
         affiliate_link_bundle TEXT,
         kombipaket_freigegeben BOOLEAN DEFAULT FALSE,
-        tentary_id TEXT UNIQUE
+        tentary_id TEXT UNIQUE,
+        anzeige_name TEXT
     )
     """)
     cursor.execute("""
@@ -52,6 +53,7 @@ def initialize_session():
         "affiliate_link": "https://sarahtemmel.tentary.com/p/q9fupC",
         "affiliate_link_bundle": "https://sarahtemmel.tentary.com/p/e1I0e5",
         "kombipaket_freigegeben": False,
+        "anzeige_name": "Sarah",
         "user_email": "",
         "begruessung_gesetzt": False
     }
@@ -72,7 +74,7 @@ tentary_id_from_url = query_params.get("a", [None])[0]
 if tentary_id_from_url and not st.session_state.tentary_loaded:
     try:
         cursor.execute("""
-            SELECT affiliate_link, affiliate_link_bundle, kombipaket_freigegeben 
+            SELECT affiliate_link, affiliate_link_bundle, kombipaket_freigegeben, anzeige_name 
             FROM selly_users 
             WHERE tentary_id = %s
         """, (tentary_id_from_url,))
@@ -82,6 +84,7 @@ if tentary_id_from_url and not st.session_state.tentary_loaded:
             st.session_state["affiliate_link"] = result[0]
             st.session_state["affiliate_link_bundle"] = result[1] or "https://sarahtemmel.tentary.com/p/e1I0e5"
             st.session_state["kombipaket_freigegeben"] = result[2]
+            st.session_state["anzeige_name"] = result[3] or "Sarah"
             st.session_state.tentary_loaded = True
     except Exception as e:
         st.error("❌ Fehler beim Laden der Affiliate-Daten.")
@@ -93,7 +96,7 @@ with st.sidebar:
     if st.button("Login"):
         try:
             cursor.execute("""
-                SELECT affiliate_link, affiliate_link_bundle, kombipaket_freigegeben, tentary_id 
+                SELECT affiliate_link, affiliate_link_bundle, kombipaket_freigegeben, tentary_id, anzeige_name 
                 FROM selly_users 
                 WHERE email = %s
             """, (login_email,))
@@ -105,6 +108,7 @@ with st.sidebar:
                 st.session_state.affiliate_link_bundle = result[1] or "https://sarahtemmel.tentary.com/p/e1I0e5"
                 st.session_state.kombipaket_freigegeben = result[2]
                 st.session_state.tentary_id = result[3] or "Sarah"
+                st.session_state.anzeige_name = result[4] or "Sarah"
                 st.session_state.tentary_loaded = True
                 st.success("✅ Zugang bestätigt! Selly verkauft jetzt mit deinem Link.")
 
@@ -116,7 +120,7 @@ with st.sidebar:
                     else:
                         st.markdown(f"🤖 **Nur Bots-Link:** [Zum Shop]({result[0]})")
 
-                st.markdown(f"👤 Eingeloggt als: `{st.session_state['tentary_id']}`")
+                st.markdown(f"👤 Eingeloggt als: `{st.session_state['anzeige_name']}`")
             else:
                 st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
         except Exception as e:
@@ -124,22 +128,29 @@ with st.sidebar:
 
 # --- Selly Begrüßung & Chat ---
 if not st.session_state.begruessung_gesetzt:
-    name = st.session_state.get("tentary_id", "Sarah")
+    name = st.session_state.get("anzeige_name", "Sarah")
     st.image("https://i.postimg.cc/xq1yKCRq/selly-start.png", width=220)
-    if name != "Sarah":
-        begruessung = f"Hey, ich bin Selly – deine KI Selling Queen 👑\n\nHeute bin ich ganz persönlich im Auftrag von **{name}** für dich da."
-    else:
-        begruessung = "Hey, ich bin Selly – deine KI Selling Queen 👑\n\nHeute bin ich ganz persönlich im Auftrag von **Sarah** für dich da."
 
-    st.markdown(f"""
+    begruessung = f"""
         ## 👑 Selly – deine KI Selling Queen
 
-        {begruessung}  
-        Ich helfe dir, smart & emotional mit KI zu verkaufen.
+        Hey 💛 Schön, dass du da bist!
 
-        Schreib mir einfach – ich hör dir zu 💬
-    """)
+        Ich bin Selly – heute ganz persönlich im Auftrag von **{name}** für dich da ✨
+
+        Stell dir mal vor: Ein Business, das für dich verkauft – automatisch. Ohne ständig posten zu müssen. Ohne Sales Calls. Und ohne Vorkenntnisse.
+
+        Genau das ist möglich – und ich zeig dir, wie.
+
+        Aber zuerst erzähl mir mal kurz:
+        🔹 Bist du gerade auf der Suche nach einem smarten Nebenverdienst?  
+        🔸 Oder willst du dir ein skalierbares Einkommen aufbauen?
+
+        Je nachdem, was besser zu dir passt, tauchen wir gemeinsam ein 💬
+    """
+
+    st.markdown(begruessung)
     st.session_state.begruessung_gesetzt = True
 
-# Nur anzeigen, wenn App nicht blockiert ist
+# Eingabefeld für Chat
 st.text_input("Schreib mir…")
