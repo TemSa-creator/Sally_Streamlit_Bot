@@ -1,8 +1,6 @@
 import streamlit as st
 import openai
-from openai import OpenAI
 import psycopg2
-import re
 import os
 
 # --- Seiteneinstellungen ---
@@ -22,7 +20,6 @@ try:
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Tabellen erstellen, falls nicht vorhanden
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS selly_users (
         email TEXT PRIMARY KEY,
@@ -43,27 +40,31 @@ try:
     """)
     conn.commit()
 except Exception as e:
-    st.error(f"❌ Datenbankfehler: {e}")
+    st.warning("⚠️ Hinweis: Die Verbindung zur Datenbank ist nicht möglich.")
 
-# --- Session States ---
-for key, default in {
-    "authenticated": False,
-    "messages": [],
-    "tentary_loaded": False,
-    "tentary_id": "Sarah",
-    "affiliate_link": "https://sarahtemmel.tentary.com/p/q9fupC",
-    "affiliate_link_bundle": "https://sarahtemmel.tentary.com/p/e1I0e5",
-    "kombipaket_freigegeben": False,
-    "user_email": "",
-    "begruessung_gesetzt": False
-}.items():
-    if key not in st.session_state:
-        st.session_state[key] = default
+# --- Session State Defaults ---
+def initialize_session():
+    defaults = {
+        "authenticated": False,
+        "messages": [],
+        "tentary_loaded": False,
+        "tentary_id": "Sarah",
+        "affiliate_link": "https://sarahtemmel.tentary.com/p/q9fupC",
+        "affiliate_link_bundle": "https://sarahtemmel.tentary.com/p/e1I0e5",
+        "kombipaket_freigegeben": False,
+        "user_email": "",
+        "begruessung_gesetzt": False
+    }
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
 
-# --- URL-Parameter auslesen (Fallback-kompatibel) ---
+initialize_session()
+
+# --- Kompatible URL-Parameter-Abfrage ---
 try:
     query_params = st.experimental_get_query_params()
-except:
+except AttributeError:
     query_params = st.query_params
 
 tentary_id_from_url = query_params.get("a", [None])[0]
@@ -83,7 +84,7 @@ if tentary_id_from_url and not st.session_state.tentary_loaded:
             st.session_state["kombipaket_freigegeben"] = result[2]
             st.session_state.tentary_loaded = True
     except Exception as e:
-        st.error(f"Fehler beim Laden des Affiliate-Links: {e}")
+        st.error("❌ Fehler beim Laden der Affiliate-Daten.")
 
 # --- Sidebar Login ---
 with st.sidebar:
@@ -105,12 +106,11 @@ with st.sidebar:
                 st.session_state.kombipaket_freigegeben = result[2]
                 st.session_state.tentary_id = result[3] or "Sarah"
                 st.session_state.tentary_loaded = True
-                st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
+                st.success("✅ Zugang bestätigt! Selly verkauft jetzt mit deinem Link.")
 
                 if result[3]:
                     selly_link = f"https://selly-bot.onrender.com?a={result[3]}"
                     st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen]({selly_link})")
-
                     if result[2]:
                         st.markdown(f"📦 **Bundle-Link (Bots + Selly):** [Zum Shop]({result[1]})")
                     else:
@@ -120,4 +120,22 @@ with st.sidebar:
             else:
                 st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
         except Exception as e:
-            st.error(f"Fehler beim Login: {e}")
+            st.error("Fehler beim Login.")
+
+# --- Selly Begrüßung & Chat ---
+if not st.session_state.begruessung_gesetzt:
+    name = st.session_state["tentary_id"]
+    st.image("https://i.postimg.cc/xq1yKCRq/selly-start.png", width=220)
+    st.markdown(f"""
+        ## 👑 Selly – deine KI Selling Queen
+
+        Hey, ich bin Selly – deine KI Selling Queen 👑  
+        Heute bin ich ganz persönlich im Auftrag von **{name}** für dich da.  
+        Ich helfe dir, smart & emotional mit KI zu verkaufen.
+
+        Schreib mir einfach – ich hör dir zu 💬
+    """)
+    st.session_state.begruessung_gesetzt = True
+
+# Nur anzeigen, wenn App nicht blockiert ist
+st.text_input("Schreib mir…")
