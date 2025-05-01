@@ -116,7 +116,7 @@ with st.sidebar:
         except Exception as e:
             st.error(f"Fehler beim Login: {e}")
 
-auftraggeber = st.session_state.get("tentary_id", "Sarah")
+auftraggeber = tentary_id_from_url if tentary_id_from_url else st.session_state.get("tentary_id", "Sarah")
 affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
 # --- Selly anzeigen ---
