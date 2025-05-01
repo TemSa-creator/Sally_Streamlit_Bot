@@ -54,6 +54,7 @@ for key, default in {
     "affiliate_link": "https://sarahtemmel.tentary.com/p/q9fupC",
     "affiliate_link_bundle": "https://sarahtemmel.tentary.com/p/e1I0e5",
     "kombipaket_freigegeben": False,
+    "user_email": ""
 }.items():
     if key not in st.session_state:
         st.session_state[key] = default
@@ -78,9 +79,6 @@ if tentary_id_from_url and not st.session_state.tentary_loaded:
             st.session_state.tentary_loaded = True
     except Exception as e:
         st.error(f"Fehler beim Laden des Affiliate-Links: {e}")
-
-auftraggeber = st.session_state["tentary_id"]
-affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
 # --- Sidebar Login ---
 with st.sidebar:
@@ -111,10 +109,17 @@ with st.sidebar:
                         st.markdown(f"📦 **Bundle-Link (Bots + Selly):** [Zum Shop]({result[1]})")
                     else:
                         st.markdown(f"🤖 **Nur Bots-Link:** [Zum Shop]({result[0]})")
+
+                # Affiliate-Info anzeigen
+                st.markdown(f"👤 Eingeloggt als: `{result[3]}`")
             else:
                 st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
         except Exception as e:
             st.error(f"Fehler beim Login: {e}")
+
+# --- Auftraggeber (nach Login setzen) ---
+auftraggeber = st.session_state.get("tentary_id", "Sarah")
+affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
 # --- Selly anzeigen ---
 st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
