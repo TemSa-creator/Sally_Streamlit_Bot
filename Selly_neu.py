@@ -118,8 +118,10 @@ with st.sidebar:
         except Exception as e:
             st.error(f"Fehler beim Login: {e}")
 
-# --- Auftraggeber korrekt bestimmen ---
-auftraggeber = st.session_state["tentary_id"] if st.session_state.get("tentary_id") else "Sarah"
+# --- Auftraggeber dynamisch bestimmen ---
+auftraggeber = st.session_state.get("tentary_id", "Sarah")
+if not auftraggeber or auftraggeber.strip() == "":
+    auftraggeber = "Sarah"
 affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
 # --- Selly anzeigen ---
