@@ -78,7 +78,7 @@ if "kombipaket_freigegeben" not in st.session_state:
 auftraggeber = st.session_state["tentary_id"]
 affiliate_link = st.session_state["affiliate_link_bundle"] if st.session_state["kombipaket_freigegeben"] else st.session_state["affiliate_link"]
 
-# --- Systemnachricht ---
+# --- Begrüßung & Systemtext ---
 if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
         "role": "system",
@@ -90,104 +90,33 @@ if "system_message_added" not in st.session_state:
             "Mache niemals das Angebot eines 14-tägigen Widerrufsrechts. "
             "Die 50 AI Business Bots kosten 297 €, Selly ist ein optionales Upgrade für 299 €. "
             "Das gesamte Kombipaket (Bots + Selly) kostet 589 €. "
+            "Die 50 AI Business Bots bleiben dauerhaft bei 297 €. "
             "Für den Verkauf der 50 AI Business Bots erhalten Tentary-Affiliates eine feste Provision von 50 %. "
-            "Selly ist nicht im Affiliate-Programm enthalten. "
+            "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
             f"Wenn jemand nur die Bots möchte, leite zu diesem Link weiter: {st.session_state['affiliate_link']} "
-            f"Wenn jemand das komplette Business möchte, leite zu diesem Link weiter: {st.session_state['affiliate_link_bundle']} "
+            f"Wenn jemand das komplette Business mit Selly will, leite zu diesem Bundle-Link weiter: {st.session_state['affiliate_link_bundle']}. "
+            "Antworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
+            "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
         )
     })
     st.session_state.system_message_added = True
 
-# --- Begrüßung ---
+# --- Begrüßung der Besuchenden ---
 if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
             f"Hey 🤍 Schön, dass du da bist!\n\n"
-            f"Ich bin Selly – heute im Auftrag von {auftraggeber} da ✨\n\n"
-            f"Darf ich dich etwas fragen – ganz offen?\n\n"
-            f"Was wäre für dich im Moment wertvoller:\n"
-            f"✨ Ein klarer Einstieg mit einfachen Tools, um loszulegen?\n"
-            f"✨ Oder direkt ein kompletter Fahrplan, der dich schneller zum Ziel bringt?\n\n"
-            f"Ich bin ganz Ohr und finde gemeinsam mit dir den besten nächsten Schritt 💬"
+            f"Ich bin Selly – heute ganz persönlich im Auftrag von {auftraggeber} für dich da.\n\n"
+            f"Stell dir mal vor:\n"
+            f"Ein Business, das für dich verkauft – automatisch.\n"
+            f"Ohne ständig posten zu müssen.\n"
+            f"Ohne Sales Calls.\n"
+            f"Und ohne Vorkenntnisse.\n\n"
+            f"Genau das ist möglich – und ich zeig dir, wie.\n\n"
+            f"Aber zuerst erzähl mir mal kurz:\n"
+            f"🔹 Bist du gerade auf der Suche nach einem smarten Nebenverdienst?\n"
+            f"🔸 Oder willst du dir ein skalierbares Einkommen aufbauen, das zu deinem Leben passt?\n\n"
+            f"Je nachdem, was besser zu dir passt, tauchen wir dann gemeinsam ein. Deal? 💬"
         )
     })
-
-# --- Sidebar Login ---
-with st.sidebar:
-    st.markdown("### 🔐 Login für Käufer")
-    login_email = st.text_input("Deine Käufer-E-Mail:")
-    if st.button("Login"):
-        cursor.execute("SELECT affiliate_link, affiliate_link_bundle, tentary_id FROM selly_users WHERE email = %s", (login_email,))
-        result = cursor.fetchone()
-        if result:
-            st.session_state.authenticated = True
-            st.session_state.user_email = login_email
-            st.session_state.affiliate_link = result[0]
-            st.session_state.affiliate_link_bundle = result[1]
-            st.session_state.tentary_id = result[2]
-            st.session_state.tentary_loaded = True
-            st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
-            if result[2]:
-                st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen](https://selly-bot.onrender.com?a={result[2]})")
-                st.markdown(f"🤝 **Selly ist im Auftrag von `{result[2]}` aktiv.**")
-        else:
-            st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
-    st.markdown("---")
-    st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
-
-# --- Bild & Titel ---
-st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
-st.title("👑 Selly – deine KI Selling Queen")
-
-# --- Nachrichtenanzeige ---
-for msg in st.session_state.messages:
-    if msg["role"] != "system":
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
-
-# --- Eingabe ---
-user_input = st.chat_input("Schreib mir...")
-
-if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
-        st.markdown(user_input)
-
-    try:
-        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=st.session_state.messages,
-            temperature=0.7
-        )
-        bot_reply = response.choices[0].message.content
-    except Exception as e:
-        bot_reply = f"Fehler: {e}"
-
-    st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-    with st.chat_message("assistant"):
-        st.markdown(bot_reply)
-
-    # Leads erkennen & speichern
-    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', user_input)
-    if email_match:
-        lead_email = email_match.group(0)
-        st.success(f"🎉 Danke für deine Nachricht, {lead_email}!")
-        if st.session_state.authenticated:
-            link = f"https://selly-bot.onrender.com?a={st.session_state.tentary_id}"
-            st.markdown(f"🔗 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
-        else:
-            st.markdown("🔗 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
-
-        cursor.execute("""
-            INSERT INTO selly_tracking (tentary_id, user_input, email_erkannt)
-            VALUES (%s, %s, %s)
-        """, (
-            st.session_state.get("tentary_id", "Unbekannt"),
-            user_input,
-            lead_email
-        ))
-        conn.commit()
-
-conn.close()
