@@ -71,7 +71,7 @@ if "tentary_id" not in st.session_state:
 if "affiliate_link" not in st.session_state:
     st.session_state["affiliate_link"] = "https://sarahtemmel.tentary.com/p/q9fupC"
 if "affiliate_link_bundle" not in st.session_state:
-    st.session_state["affiliate_link_bundle"] = None
+    st.session_state["affiliate_link_bundle"] = "https://sarahtemmel.tentary.com/p/e1I0e5"
 if "kombipaket_freigegeben" not in st.session_state:
     st.session_state["kombipaket_freigegeben"] = False
 
@@ -89,7 +89,7 @@ if "system_message_added" not in st.session_state:
             "Du kennst die Regeln für digitale Produkte: Bei digitalen Downloads erlischt das Widerrufsrecht nach Bereitstellung. "
             "Mache niemals das Angebot eines 14-tägigen Widerrufsrechts. "
             "Die 50 AI Business Bots kosten 297 €, Selly ist ein optionales Upgrade für 299 €. "
-            "Das gesamte Kombipaket (Bots + Selly) kostet ab sofort 589 €. "
+            "Das gesamte Kombipaket (Bots + Selly) kostet 589 €. "
             "Die 50 AI Business Bots bleiben dauerhaft bei 297 €. "
             "Für den Verkauf der 50 AI Business Bots erhalten Tentary-Affiliates eine feste Provision von 50 %. "
             "Selly ist **nicht im Affiliate-Programm enthalten** – nur das Hauptpaket. "
@@ -100,3 +100,18 @@ if "system_message_added" not in st.session_state:
         )
     })
     st.session_state.system_message_added = True
+
+# --- Begrüßung der Besuchenden ---
+if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": (
+            f"Hey 🤍 Schön, dass du da bist!\n\n"
+            f"Ich bin Selly – heute im Auftrag von {auftraggeber} da ✨\n\n"
+            f"Darf ich dich etwas fragen – ganz offen?\n\n"
+            f"Was wäre für dich im Moment wertvoller:\n"
+            f"✨ Ein klarer Einstieg mit einfachen Tools, um loszulegen?\n"
+            f"✨ Oder direkt ein kompletter Fahrplan, der dich schneller zum Ziel bringt?\n\n"
+            f"Ich bin ganz Ohr und finde gemeinsam mit dir den besten nächsten Schritt 💬"
+        )
+    })
