@@ -119,7 +119,6 @@ if "system_message_added" not in st.session_state:
             "- Die 50 AI Business Bots kosten 297 €.\n"
             "- Selly ist ein optionales Upgrade für 299 €.\n"
             "- Im Bundle spart man bares Geld: Das Kombipaket kostet 589 €.\n"
-            "- Die 50 AI Business Bots bleiben dauerhaft bei 297 €.\n"
             "- Nur das Bundle ist provisionsfähig. Selly einzeln gehört **nicht** ins Affiliate-Programm.\n"
             "Du führst Interessenten charmant zu ihrer Lösung – ohne Druck. "
             "Du stellst erst gezielte Fragen, um das Ziel des Gegenübers zu verstehen."
