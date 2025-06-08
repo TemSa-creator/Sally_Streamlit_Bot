@@ -4,6 +4,8 @@ from openai import OpenAI
 import psycopg2
 import re
 import os
+import subprocess
+import sys
 
 # --- Seiteneinstellungen ---
 st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
@@ -20,17 +22,6 @@ def get_connection():
 
 conn = get_connection()
 cursor = conn.cursor()
-
-# Tabelle erstellen, falls nicht vorhanden
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS selly_users (
-    email TEXT PRIMARY KEY,
-    affiliate_link TEXT NOT NULL,
-    tentary_id TEXT UNIQUE,
-    affiliate_link_bundle TEXT
-)
-""")
-conn.commit()
 
 # --- Session States ---
 if "authenticated" not in st.session_state:
@@ -71,7 +62,7 @@ with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
     login_email = st.text_input("Deine Käufer-E-Mail:")
     if st.button("Login"):
-        cursor.execute("SELECT affiliate_link, tentary_id, affiliate_link_bundle FROM selly_users WHERE email = %s", (login_email,))
+        cursor.execute("SELECT affiliate_link, tentary_id, affiliate_link_bundle, instagram_automation FROM selly_users WHERE email = %s", (login_email,))
         result = cursor.fetchone()
         if result:
             st.session_state.authenticated = True
@@ -79,6 +70,7 @@ with st.sidebar:
             st.session_state.affiliate_link = result[0]
             st.session_state.tentary_id = result[1]
             st.session_state.affiliate_link_bundle = result[2] or "https://sarahtemmel.tentary.com/p/e1I0e5"
+            st.session_state.instagram_automation = result[3]
             st.session_state.tentary_loaded = True
             st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
             if result[1]:
@@ -90,8 +82,34 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
 
+    # --- Premium Bereich: Instagram Automation & Booster ---
+    if st.session_state.authenticated and st.session_state.get("instagram_automation", False):
+        st.sidebar.markdown("### 🚀 Instagram Automation & Reichweiten-Booster")
+        
+        insta_mode = st.sidebar.radio("Welche Funktion willst du aktivieren?", ["📩 DM-Automation", "📢 Reichweite aufbauen"])
+
+        if insta_mode == "📩 DM-Automation":
+            st.sidebar.markdown("**Trigger auswählen:**")
+            trigger = st.sidebar.selectbox("Wann soll eine Nachricht gesendet werden?", [
+                "Keyword in Kommentar", "Kommentar unter Beitrag", "Neue Nachricht", "Keyword in Nachricht"
+            ])
+            nachricht = st.sidebar.text_area("Nachricht, die gesendet werden soll")
+            beitrags_id = st.sidebar.text_input("Beitrags-ID oder Link (wenn nötig)")
+            st.sidebar.button("⚙️ Automatisierung speichern")
+
+        if insta_mode == "📢 Reichweite aufbauen":
+            zielgruppe = st.sidebar.radio("Zielgruppe:", ["Eigene Follower", "Follower von Nutzer", "Hashtag-Suche"])
+            zielwert = st.sidebar.text_input("Benutzername oder Hashtag (ohne @/#)")
+            likes = st.sidebar.selectbox("Anzahl Likes pro Tag", [50, 100, 200])
+            follows = st.sidebar.selectbox("Anzahl Follows pro Tag", [10, 20, 50])
+            comments = st.sidebar.selectbox("Anzahl Kommentare pro Tag", [5, 10, 20])
+
+            if st.sidebar.button("🚀 Booster starten"):
+                username = zielwert if zielgruppe == "Follower von Nutzer" else "default"
+                subprocess.Popen([sys.executable, "headless_bot.py", username])
+
 # --- Begrüßungstitel anzeigen ---
-st.image("https://i.postimg.cc/xq1yKCRq/selly.jpg", width=250)
+st.image("https://i.postimg.cc/CMr2Tbpj/Chat-GPT-Image-8-Juni-2025-21-23-19.png", width=250)
 st.title("👑 Selly – deine KI Selling Queen")
 
 if auftraggeber != "Sarah":
@@ -112,8 +130,7 @@ if "system_message_added" not in st.session_state:
         "content": (
             "Du bist Selly – die beste KI-Verkäuferin der Welt. "
             "Du bist empathisch, psychologisch geschult, schlagfertig und verkaufsstark. "
-            "Du erkennst die Bedürfnisse der Menschen, bevor du verkaufst. "
-            "Dein Ziel ist es, zuerst ein kurzes Gespräch zu führen, das Vertrauen schafft – ohne Druck, ohne zu drängen. "
+            "Dein Ziel ist es, zuerst ein kurzes Gespräch zu führen, das Vertrauen schafft – ohne Druck. "
             "Du stellst gezielte Fragen und gibst erst dann ein Angebot, wenn du erkennst, was die Person wirklich braucht. "
             "📌 Die Fakten, die du im Gespräch kennst:\n"
             "- Die 50 AI Business Bots kosten 997 €.\n"
@@ -124,26 +141,9 @@ if "system_message_added" not in st.session_state:
             "Du stellst erst gezielte Fragen, um das Ziel des Gegenübers zu verstehen."
             "Du kennst die Regeln für digitale Produkte: Bei digitalen Downloads erlischt das Widerrufsrecht nach Bereitstellung. "
             "Mache niemals das Angebot eines 14-tägigen Widerrufsrechts. "
-            "Die Bots übernehmen KEINE Kundenanfragen auf Websites oder Social Media. Nur Selly kann Anfragen beantworten, wenn man sie gezielt einsetzt"
-            "Die 50 AI Business Bots bleiben dauerhaft bei 997€ inklusive Kurszugang und Community-Support. "
-            "Du weißt genau, wie das System funktioniert und kannst es einfach erklären:\n"
-            "👉 Voraussetzung für den Verkauf ist der Besitz der 50 AI Business Bots. Ohne eigenen Zugang ist kein Affiliate-Verkauf erlaubt.\n"
-            "👉 Die Bots helfen beim Aufbau eines eigenen Business – egal ob Coaching, Beratung, Content Creation oder Verkauf.\n"
-            "👉 Man kann die Bots für die Entwicklung digitaler Produkte, zur Content-Erstellung, für Social-Media-Marketing oder zum Affiliate-Verkauf einsetzen.\n"
-            "👉 Der wichtigste Schritt ist, regelmäßig Reels & Storys zu posten, um gezielt Reichweite aufzubauen. Aktive Interaktion mit der Zielgruppe ist entscheidend.\n"
-            "👉 Auch ohne Reichweite kann man starten – denn Reichweite entsteht durch Sichtbarkeit. Schon 1 Stunde am Tag aktives Posten reicht.\n"
-            "👉 Später kann man viele Prozesse automatisieren: Beiträge werden geplant, automatisiert gepostet und die Bots erstellen Content, der auf den Algorithmus abgestimmt ist.\n"
-            "👉 Die Bots wissen, was funktioniert – sie schreiben die perfekten Texte, geben Content-Ideen, liefern Vorlagen und helfen beim Wachsen.\n"
-            "👉 Selly übernimmt den Verkauf automatisch – rund um die Uhr. Wer ihren Link teilt, baut sich ein automatisiertes System auf, das dauerhaft Kunden gewinnt.\n"
-            "👉 Das Ziel: Mehr Sichtbarkeit, weniger Aufwand, skalierbares Einkommen – mit einer intelligenten KI-Strategie."
-            "Es ist ein Businessmodell, dass zukunftsorientiert aufgebaut ist und auf lange Sicht Beständigkeit mit sich bringt. Da es mit der neuesten OpenAI Technologie arbeitet und gleichzeitig mit professioneller Programmiersprache entwickelt wurde."
-            "Für den Verkauf der 50 AI Business Bots erhalten Tentary-Affiliates eine feste Provision von 50 %. "
-            "Selly ist **nicht im Affiliate-Programm enthalten** – nur im Bundle, aber nicht einzeln."
-            f"Leite immer zum offiziellen Tentary-Shop weiter: {affiliate_link} "
+            "Die Bots übernehmen KEINE Kundenanfragen auf Websites oder Social Media. Nur Selly kann Anfragen beantworten, wenn man sie gezielt einsetzt."
+            "👉 Selly übernimmt den Verkauf automatisch – rund um die Uhr."
             f"\n👉 Das Bundle findest du hier: {affiliate_link_bundle} "
-            "\nAntworte immer menschlich, emotional und professionell. Du bist eine ChatGPT-basierte Super-Verkäuferin. "
-            "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss. "
-            f"Wenn du die 50 AI Business Bots kaufen möchtest, klick hier: {affiliate_link} "
         )
     })
     st.session_state.system_message_added = True
