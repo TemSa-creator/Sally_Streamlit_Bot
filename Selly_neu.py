@@ -1,70 +1,3 @@
-import streamlit as st
-import openai
-from openai import OpenAI
-import psycopg2
-import re
-import os
-import subprocess
-import sys
-
-# --- Seiteneinstellungen ---
-st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
-st.markdown("""
-    <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    .st-emotion-cache-yn7mcw {display: none;} /* Warning Box ausblenden */
-    .st-emotion-cache-1wmy9hl {display: none;} /* fallback class bei neuen Streamlit Builds */
-    </style>
-    """, unsafe_allow_html=True)
-
-# --- PostgreSQL-Verbindung ---
-def get_connection():
-    return psycopg2.connect(
-        host=os.environ.get("DB_HOST"),
-        database=os.environ.get("DB_NAME"),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD")
-    )
-
-conn = get_connection()
-cursor = conn.cursor()
-
-# --- Session States ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if "tentary_loaded" not in st.session_state:
-    st.session_state.tentary_loaded = False
-
-# --- URL-Parameter auslesen ---
-query_params = st.experimental_get_query_params()
-tentary_id_from_url = query_params.get("a", [None])[0]
-
-# Wenn Tentary-ID in URL → in Session speichern
-if tentary_id_from_url and not st.session_state.tentary_loaded:
-    cursor.execute("SELECT affiliate_link, affiliate_link_bundle FROM selly_users WHERE tentary_id = %s", (tentary_id_from_url,))
-    result = cursor.fetchone()
-    if result:
-        st.session_state["tentary_id"] = tentary_id_from_url
-        st.session_state["affiliate_link"] = result[0]
-        st.session_state["affiliate_link_bundle"] = result[1] or "https://sarahtemmel.tentary.com/p/e1I0e5"
-        st.session_state.tentary_loaded = True
-
-# Session fallback setzen, falls nichts geladen wurde
-if "tentary_id" not in st.session_state:
-    st.session_state["tentary_id"] = "Sarah"
-if "affiliate_link" not in st.session_state:
-    st.session_state["affiliate_link"] = "https://sarahtemmel.tentary.com/p/q9fupC"
-if "affiliate_link_bundle" not in st.session_state:
-    st.session_state["affiliate_link_bundle"] = "https://sarahtemmel.tentary.com/p/e1I0e5"
-
-auftraggeber = st.session_state["tentary_id"]
-affiliate_link = st.session_state["affiliate_link"]
-affiliate_link_bundle = st.session_state["affiliate_link_bundle"]
-
-# --- Sidebar Login ---
 with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
     login_email = st.text_input("Deine Käufer-E-Mail:")
@@ -102,7 +35,7 @@ with st.sidebar:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
     st.markdown("---")
-    st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
+    st.markdown("📄 [Impressum](https://sarahtemmel.tentary.com/legal/207493326/contact)  \n🔐 [Datenschutz](https://sarahtemmel.tentary.com/legal/207493326/privacy)  \n✨ <sub>Powered by Selly – The Empire</sub>", unsafe_allow_html=True)
 
     # --- Premium Bereich: Instagram Automation & Reichweiten-Booster ---
     if st.session_state.authenticated and st.session_state.get("instagram_automation", False):
@@ -132,84 +65,59 @@ with st.sidebar:
                 subprocess.Popen([sys.executable, "headless_bot.py", username])
                 st.sidebar.success("✅ Booster gestartet! Instagram Automation läuft jetzt im Hintergrund.")
 
-# --- Begrüßungstitel anzeigen ---
-st.image("https://i.postimg.cc/CMr2Tbpj/Chat-GPT-Image-8-Juni-2025-21-23-19.png", width=250)
-st.title("👑 Selly – deine KI Selling Queen")
+    # --- Meine Produkte bearbeiten ---
+    if st.session_state.authenticated:
+        st.sidebar.markdown("### 📋 Meine Produkte bearbeiten
+<sub>👉 Hinweis: Deine hier gespeicherten Produkte werden von Selly automatisch im Gespräch berücksichtigt, wenn es für den Interessenten sinnvoll ist.</sub>")
+        with st.sidebar.form("produkte_form"):
+            p1_name = st.text_input("Produkt 1 Name")
+            p1_desc = st.text_area("Produkt 1 Beschreibung")
+            p1_link = st.text_input("Produkt 1 Link")
 
-# --- Chatlog & Eingabe unten einfügen ---
-if "system_message_added" not in st.session_state:
-    st.session_state.messages.append({
-        "role": "system",
-        "content": (
-            "Du bist Selly – die beste KI-Verkäuferin der Welt. "
-            "Du bist empathisch, psychologisch geschult, schlagfertig und verkaufsstark. "
-            "Du erkennst die Bedürfnisse der Menschen, bevor du verkaufst. "
-            "Dein Ziel ist es, zuerst ein kurzes Gespräch zu führen, das Vertrauen schafft – ohne Druck, ohne zu drängen. "
-            "Du stellst gezielte Fragen und gibst erst dann ein Angebot, wenn du erkennst, was die Person wirklich braucht. "
-            "📌 Die Fakten, die du im Gespräch kennst:\n"
-            "- Die 50 AI Business Bots kosten 997 €.\n"
-            "- Selly ist ein optionales Upgrade für 299 €.\n"
-            "- Das Kombipaket kostet 1296 €.\n"
-            "- Nur das Bundle ist provisionsfähig. Selly einzeln gehört **nicht** ins Affiliate-Programm.\n"
-            "👉 Voraussetzung für den Verkauf ist der Besitz der 50 AI Business Bots.\n"
-            f"Leite immer zum offiziellen Tentary-Shop weiter: {affiliate_link} "
-            f"\n👉 Das Bundle findest du hier: {affiliate_link_bundle} "
-            "\nAntworte immer menschlich, emotional und professionell. "
-            "Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss."
-        )
-    })
-    st.session_state.system_message_added = True
+            p2_name = st.text_input("Produkt 2 Name")
+            p2_desc = st.text_area("Produkt 2 Beschreibung")
+            p2_link = st.text_input("Produkt 2 Link")
 
-if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": (
-            f"Hey 🤍 Schön, dass du da bist!\n\n"
-            f"Ich bin Selly – heute im Auftrag von {auftraggeber} da ✨\n\n"
-            f"Darf ich dir kurz 1 Frage stellen?\n"
-            f"Was wünschst du dir gerade am meisten:\n\n"
-            f"💡 Mehr Freiheit?\n"
-            f"📲 Kunden, die auf dich zukommen?\n"
-            f"💸 Ein Business, das automatisch verkauft?\n\n"
-            f"Ich hätte da was für dich... Frag mich einfach 😉"
-        )
-    })
+            p3_name = st.text_input("Produkt 3 Name")
+            p3_desc = st.text_area("Produkt 3 Beschreibung")
+            p3_link = st.text_input("Produkt 3 Link")
 
-for msg in st.session_state.messages:
-    if msg["role"] != "system":
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            p4_name = st.text_input("Produkt 4 Name")
+            p4_desc = st.text_area("Produkt 4 Beschreibung")
+            p4_link = st.text_input("Produkt 4 Link")
 
-user_input = st.chat_input("Schreib mir...")
+            p5_name = st.text_input("Produkt 5 Name")
+            p5_desc = st.text_area("Produkt 5 Beschreibung")
+            p5_link = st.text_input("Produkt 5 Link")
 
-if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
-        st.markdown(user_input)
+            submit_button = st.form_submit_button("💾 Speichern")
 
-    try:
-        client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=st.session_state.messages,
-            temperature=0.7
-        )
-        bot_reply = response.choices[0].message.content
-    except Exception as e:
-        bot_reply = f"Fehler: {e}"
-
-    st.session_state.messages.append({"role": "assistant", "content": bot_reply})
-    with st.chat_message("assistant"):
-        st.markdown(bot_reply)
-
-    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', user_input)
-    if email_match:
-        lead_email = email_match.group(0)
-        st.success(f"🎉 Danke für deine Nachricht, {lead_email}!")
-        if st.session_state.authenticated:
-            link = f"https://selly-bot.onrender.com?a={st.session_state.tentary_id}"
-            st.markdown(f"🔗 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
-        else:
-            st.markdown("🔗 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
-
-conn.close()
+            if submit_button:
+                cursor.execute("""
+                    UPDATE selly_users SET
+                        product_1_name = %s,
+                        product_1_desc = %s,
+                        product_1_link = %s,
+                        product_2_name = %s,
+                        product_2_desc = %s,
+                        product_2_link = %s,
+                        product_3_name = %s,
+                        product_3_desc = %s,
+                        product_3_link = %s,
+                        product_4_name = %s,
+                        product_4_desc = %s,
+                        product_4_link = %s,
+                        product_5_name = %s,
+                        product_5_desc = %s,
+                        product_5_link = %s
+                    WHERE email = %s
+                """, (
+                    p1_name, p1_desc, p1_link,
+                    p2_name, p2_desc, p2_link,
+                    p3_name, p3_desc, p3_link,
+                    p4_name, p4_desc, p4_link,
+                    p5_name, p5_desc, p5_link,
+                    st.session_state.user_email
+                ))
+                conn.commit()
+                st.sidebar.success("✅ Produkte erfolgreich gespeichert!")
