@@ -79,17 +79,32 @@ with st.sidebar:
             st.session_state.affiliate_link_bundle = result[2] or "https://sarahtemmel.tentary.com/p/e1I0e5"
             st.session_state.instagram_automation = result[3]
             st.session_state.tentary_loaded = True
+
+            # Automatische Freischaltung Instagram Automation bei 5 Produkten
+            cursor.execute("""
+                SELECT product_1_name, product_2_name, product_3_name, product_4_name, product_5_name
+                FROM selly_users WHERE email = %s
+            """, (login_email,))
+            products = cursor.fetchone()
+
+            if products and all(products):  # Alle 5 Produkte gesetzt?
+                cursor.execute("""
+                    UPDATE selly_users SET instagram_automation = TRUE WHERE email = %s
+                """, (login_email,))
+                conn.commit()
+                st.session_state.instagram_automation = True
+
             st.success("✅ Zugang bestätigt! Selly verkauft ab jetzt mit deinem Link.")
             if result[1]:
                 st.markdown(f"🔗 **Dein persönlicher Selly-Link:** [Jetzt teilen](https://selly-bot.onrender.com?a={result[1]})")
-                st.markdown(f"🐝 **Selly ist im Auftrag von `{result[1]}` aktiv.**")
+                st.markdown(f"🌝 **Selly ist im Auftrag von `{result[1]}` aktiv.**")
         else:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
     st.markdown("---")
     st.markdown("📄 [Impressum](https://deine-domain.com/impressum)  \n🔐 [Datenschutz](https://deine-domain.com/datenschutz)", unsafe_allow_html=True)
 
-    # --- Premium Bereich: Instagram Automation & Booster ---
+    # --- Premium Bereich: Instagram Automation & Reichweiten-Booster ---
     if st.session_state.authenticated and st.session_state.get("instagram_automation", False):
         st.sidebar.success("✅ Premium aktiviert")
         st.sidebar.markdown("### 🚀 Instagram Automation & Reichweiten-Booster")
@@ -121,8 +136,7 @@ with st.sidebar:
 st.image("https://i.postimg.cc/CMr2Tbpj/Chat-GPT-Image-8-Juni-2025-21-23-19.png", width=250)
 st.title("👑 Selly – deine KI Selling Queen")
 
-# --- Rest bleibt unverändert (dein bestehender Chat Block bleibt wie im Ursprungs-Code)
-# --- Begrüßung & Systemtext ---
+# --- Chatlog & Eingabe unten einfügen ---
 if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
         "role": "system",
@@ -161,13 +175,11 @@ if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"])
         )
     })
 
-# --- Nachrichtenverlauf anzeigen ---
 for msg in st.session_state.messages:
     if msg["role"] != "system":
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-# --- Eingabe ---
 user_input = st.chat_input("Schreib mir...")
 
 if user_input:
@@ -190,7 +202,6 @@ if user_input:
     with st.chat_message("assistant"):
         st.markdown(bot_reply)
 
-    # Leads erkennen
     email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', user_input)
     if email_match:
         lead_email = email_match.group(0)
@@ -200,3 +211,5 @@ if user_input:
             st.markdown(f"🔗 **Hier ist dein persönlicher Selly-Link:** [Jetzt teilen]({link})")
         else:
             st.markdown("🔗 **Willst du mehr erfahren?** Schreib mir einfach weiter!")
+
+conn.close()
