@@ -91,6 +91,7 @@ with st.sidebar:
 
     # --- Premium Bereich: Instagram Automation & Booster ---
     if st.session_state.authenticated and st.session_state.get("instagram_automation", False):
+        st.sidebar.success("✅ Premium aktiviert")
         st.sidebar.markdown("### 🚀 Instagram Automation & Reichweiten-Booster")
 
         insta_mode = st.sidebar.radio("Welche Funktion willst du aktivieren?", ["📩 DM-Automation", "📢 Reichweite aufbauen"])
@@ -114,6 +115,7 @@ with st.sidebar:
             if st.sidebar.button("🚀 Booster starten"):
                 username = zielwert if zielgruppe == "Follower von Nutzer" else "default"
                 subprocess.Popen([sys.executable, "headless_bot.py", username])
+                st.sidebar.success("✅ Booster gestartet! Instagram Automation läuft jetzt im Hintergrund.")
 
 # --- Begrüßungstitel anzeigen ---
 st.image("https://i.postimg.cc/CMr2Tbpj/Chat-GPT-Image-8-Juni-2025-21-23-19.png", width=250)
