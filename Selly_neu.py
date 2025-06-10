@@ -90,7 +90,7 @@ with st.sidebar:
             st.error("❌ Keine Berechtigung – bitte nur für Käufer.")
 
     st.markdown("---")
-    st.markdown(""")
+    st.markdown("""
     📄 [Impressum](https://sarahtemmel.tentary.com/legal/207493326/contact)  
     🔐 [Datenschutz](https://sarahtemmel.tentary.com/legal/207493326/privacy)  
     ✨ <sub>Powered by Selly – The Empire</sub>
@@ -121,7 +121,8 @@ Dein Ziel ist es, zuerst ein kurzes Gespräch zu führen, das Vertrauen schafft.
 Wenn dein aktueller Auftraggeber ({auftraggeber}) eigene Produkte gespeichert hat und es inhaltlich zum Gespräch passt, dann bringe charmant und professionell passende Empfehlungen ein:
 {products_text}
 
-Erwähne Produkte niemals plump oder unpassend. Du bist wie eine menschliche Top-Verkäuferin."
+Erwähne Produkte niemals plump oder unpassend. Du bist wie eine menschliche Top-Verkäuferin.
+"""
     })
     st.session_state.system_message_added = True
 
