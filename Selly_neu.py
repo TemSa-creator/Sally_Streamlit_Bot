@@ -15,6 +15,7 @@ st.markdown("""
     footer {visibility: hidden;}
     .st-emotion-cache-yn7mcw {display: none;}
     .st-emotion-cache-1wmy9hl {display: none;}
+    .stAlert {display: none !important;}
     </style>
 """, unsafe_allow_html=True)
 
