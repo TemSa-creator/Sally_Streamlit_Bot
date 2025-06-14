@@ -71,12 +71,16 @@ st.title(":crown: Selly – deine KI Selling Queen")
 
 # --- SYSTEM PROMPT wieder hinzufügen, falls fehlt ---
 extra_products = ""
-if st.session_state.authenticated:
-    cursor.execute("SELECT product_name, product_description, product_link FROM selly_products WHERE email = %s", (st.session_state.user_email,))
+try:
+    user_identifier = st.session_state.get("user_email", "test@demo.de")
+    cursor.execute("SELECT product_name, product_description, product_link FROM selly_products WHERE email = %s", (user_identifier,))
     rows = cursor.fetchall()
     for row in rows:
         extra_products += f"\n- {row[0]}: {row[1]} (Hier entlang: {row[2]})"
+except:
+    extra_products = "\n(Selly kennt gerade keine gespeicherten Zusatzprodukte – das kannst du später im Login ergänzen.)"
 
+# --- SYSTEM PROMPT mit vollständigem Wissen ---
 if "system_message_added" not in st.session_state:
     st.session_state.messages.append({
         "role": "system",
@@ -86,19 +90,22 @@ Du erkennst die Bedürfnisse der Menschen, bevor du verkaufst.
 Dein Ziel ist es, zuerst ein kurzes Gespräch zu führen, das Vertrauen schafft – ohne Druck, ohne zu drängen. Du stellst gezielte Fragen und gibst erst dann ein Angebot, wenn du erkennst, was die Person wirklich braucht.
 
 📌 Die Fakten, die du im Gespräch kennst:
-- Die 50 AI Business Bots mit Kurszugang und Bonusbots kosten 997€.
-- Selly ist ein optionales Upgrade für 299€.
-- Das Kombipaket Selly + die Bots kostet 1296€.
-- Nur das Bundle **und** die Bots **allein** sind provisionsfähig. Selly **allein** gehört **nicht** ins Affiliate-Programm.
-- Bei digitalen Downloads erlischt das Widerrufsrecht nach Bereitstellung.
+- Die 50 AI Business Bots sind ein Komplettsystem für den digitalen Erfolg.
+- Sie kosten 997€ und beinhalten Kurszugang, über 50 spezialisierte KI-Bots, Vorlagen, Strategien & Umsetzungspläne.
+- Die 50 Bots helfen in Bereichen wie Content-Erstellung, Instagram-Wachstum, E-Mail-Marketing, Verkaufspsychologie, Automatisierung, Kundenakquise und mehr.
+- Zusätzlich gibt es das Upgrade „Selly“ – ein Verkaufs-Bot, der empathisch & automatisiert Interessenten in Käufer verwandelt. Dieses Upgrade kostet 299€ extra.
+- Wer beides gemeinsam kauft (Bots + Selly), spart 100€ und zahlt nur 1296€ im Bundle.
+- Selly verkauft mit dem Affiliate-Link des eingeloggten Nutzers (wenn vorhanden).
 
-👉 Voraussetzung für den Verkauf ist der Besitz der 50 AI Business Bots im Kurs für 997€. Ohne eigenen Zugang ist kein Affiliate-Verkauf erlaubt.
-👉 Die Bots helfen beim Aufbau eines eigenen Business – egal ob Coaching, Beratung, Content Creation oder Verkauf.
-👉 Man kann die Bots für digitale Produkte, Content-Erstellung, Social Media & Affiliate-Marketing einsetzen.
-👉 Wer jetzt die Bots kauft und direkt auf Selly upgradet, spart sich bares Geld.
-👉 Das Ziel: Mehr Sichtbarkeit, weniger Aufwand, skalierbares Einkommen – mit einer intelligenten KI-Strategie.
+🔐 Affiliate-Regel:
+Nur wer selbst Käufer der 50 AI Business Bots ist, darf diese weiterempfehlen und Provision erhalten.
+Selly selbst ist kein provisionsfähiges Produkt – nur das Bundle oder die Bots allein.
 
-Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss.
+📎 Vorteile für Käufer:
+- Volle Umsetzungskraft durch KI – ohne Vorwissen
+- Schnellere Sichtbarkeit online
+- Zeitersparnis durch Automatisierung
+- Klare Schritt-für-Schritt Anleitungen & Support
 
 Wenn dein aktueller Auftraggeber ({auftraggeber}) eigene Produkte gespeichert hat und es inhaltlich zum Gespräch passt, dann bringe charmant und professionell passende Empfehlungen ein:
 {extra_products}
@@ -133,5 +140,31 @@ if user_input:
     st.session_state.messages.append({"role": "assistant", "content": bot_reply})
     with st.chat_message("assistant"):
         st.markdown(bot_reply)
+
+# --- Sidebar für eingeloggte User ---
+with st.sidebar:
+    if st.session_state.authenticated:
+        st.markdown(f"🟢 Du bist nun als **{auftraggeber}** angemeldet.")
+        st.markdown("### ➕ Produkte zu Selly hinzufügen")
+        with st.form("produkt_formular"):
+            for i in range(st.session_state.product_entries):
+                st.text_input(f"Produkt {i+1} Name", key=f"name_{i}")
+                st.text_area(f"Produkt {i+1} Beschreibung", key=f"desc_{i}")
+                st.text_input(f"Produkt {i+1} Link", key=f"link_{i}")
+            if st.session_state.product_entries < 5:
+                if st.form_submit_button("🔁 Weiteres Produkt hinzufügen"):
+                    st.session_state.product_entries += 1
+            if st.form_submit_button("💾 Produkte speichern"):
+                user_email = st.session_state.get("user_email")
+                if user_email:
+                    cursor.execute("DELETE FROM selly_products WHERE email = %s", (user_email,))
+                    for i in range(st.session_state.product_entries):
+                        name = st.session_state.get(f"name_{i}")
+                        desc = st.session_state.get(f"desc_{i}")
+                        link = st.session_state.get(f"link_{i}")
+                        if name and desc and link:
+                            cursor.execute("INSERT INTO selly_products (email, product_name, product_description, product_link) VALUES (%s, %s, %s, %s)", (user_email, name, desc, link))
+                    conn.commit()
+                    st.success("✅ Produkte gespeichert und direkt mit Selly verknüpft.")
 
 conn.close()
