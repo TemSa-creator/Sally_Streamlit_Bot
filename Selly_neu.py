@@ -194,9 +194,9 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("""
-📄 [Impressum](https://sarahtemmel.tentary.com/legal/207493326/contact)  
-🔐 [Datenschutz](https://sarahtemmel.tentary.com/legal/207493326/privacy)  
-✨ <sub>Powered by Selly – The Empire</sub>
+ [Impressum](https://sarahtemmel.tentary.com/legal/207493326/contact)  
+ [Datenschutz](https://sarahtemmel.tentary.com/legal/207493326/privacy)  
+ <sub>Powered by Selly – The Empire</sub>
 """, unsafe_allow_html=True)
 
 
