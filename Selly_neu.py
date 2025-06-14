@@ -76,6 +76,7 @@ if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"])
         "content": (
             f"Hey ❤️ Schön, dass du da bist!
 "
+"
 
 "
             f"Ich bin Selly – heute im Auftrag von **{auftraggeber}** da ✨
