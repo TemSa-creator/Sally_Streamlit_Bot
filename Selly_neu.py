@@ -65,7 +65,7 @@ auftraggeber = st.session_state["tentary_id"]
 affiliate_link = st.session_state["affiliate_link"]
 affiliate_link_bundle = st.session_state["affiliate_link_bundle"]
 
-# --- Sidebar ---
+# --- Sidebar Login ---
 with st.sidebar:
     st.markdown("### 🔐 Login für Käufer")
     login_email = st.text_input("Deine Käufer-E-Mail:")
@@ -99,18 +99,17 @@ with st.sidebar:
     ✨ <sub>Powered by Selly – The Empire</sub>
     """, unsafe_allow_html=True)
 
-# --- Zusatzbereich: Instagram Automation ("Selly says") ---
+# --- Zusatzbereich: Instagram Automation ---
 if st.session_state.authenticated:
-    st.sidebar.markdown("### 🧠 Selly says: Instagram Automatisierung")
+    st.sidebar.markdown("### 🧐 Selly says: Instagram Automatisierung")
     with st.sidebar.form("selly_says_form"):
         automation_trigger = st.text_input("Trigger (z. B. 'mehr infos')", st.session_state.user_products.get("instagram_trigger", ""))
         automation_message = st.text_area("Was soll Selly automatisch sagen, wenn der Trigger erkannt wird?", st.session_state.user_products.get("instagram_automation", ""))
 
-        # Vorschau der Antwort
         if automation_trigger and automation_message:
             st.info(f"**Wenn jemand auf Instagram '{automation_trigger}' schreibt, sagt Selly:**\n\n{automation_message}")
 
-        submit_automation = st.form_submit_button("🔖 Automation speichern")
+        submit_automation = st.form_submit_button("🔗 Automation speichern")
 
         if submit_automation:
             cursor.execute("""
@@ -124,7 +123,7 @@ if st.session_state.authenticated:
 
     # --- Dynamische Produktauswahl ---
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📅 Zusätzliche Produkte")
+    st.sidebar.markdown("### 🗓️ Zusätzliche Produkte")
 
     if st.sidebar.button("+ Weiteres Produkt hinzufügen"):
         st.session_state.product_entries += 1
@@ -149,20 +148,16 @@ if st.session_state.authenticated:
             conn.commit()
             st.sidebar.success("✅ Alle Produkte erfolgreich gespeichert!")
 
-conn.close()
+# --- Produkte auch im Prompt verwenden ---
+extra_products = ""
+if st.session_state.authenticated:
+    cursor.execute("SELECT product_name, product_description, product_link FROM selly_products WHERE email = %s", (st.session_state.user_email,))
+    rows = cursor.fetchall()
+    for row in rows:
+        extra_products += f"\n- {row[0]}: {row[1]} (Hier entlang: {row[2]})"
 
 # --- SYSTEM PROMPT ---
 if "system_message_added" not in st.session_state:
-    products_text = ""
-    if st.session_state.get("user_products"):
-        for i in range(1, 6):
-            name = st.session_state.user_products.get(f"product_{i}_name")
-            desc = st.session_state.user_products.get(f"product_{i}_desc")
-            link = st.session_state.user_products.get(f"product_{i}_link")
-            if name and desc and link:
-                products_text += f"
-- {name}: {desc} (Hier entlang: {link})"
-
     st.session_state.messages.append({
         "role": "system",
         "content": f"""
@@ -185,19 +180,10 @@ Dein Ziel ist es, zuerst ein kurzes Gespräch zu führen, das Vertrauen schafft 
 
 Du gibst nie vorschnell auf – du behandelst Einwände charmant und führst immer zum Abschluss.
 
-Wenn der Nutzer kaufen möchte, biete ihm beide Optionen charmant an:
-1. Die 50 AI Business Bots für 997€, die sofort einsetzbar sind. Mit starkem Support und Kurszugang zu verschiedenen Modulen.
-2. Oder das Kombipaket mit Selly für 1296€, wenn er gleich alles automatisieren will.
-Verwende dabei die Links affiliate_link = {affiliate_link}, affiliate_link_bundle = {affiliate_link_bundle}.
-
-Wenn der Nutzer sich für eine Option entscheidet oder direkt nach dem Link fragt, gib den entsprechenden Link sofort und klar aus.
-
-Wenn der Nutzer direkt sagt, dass er kaufen möchte (z.B. „Ich will das“, „Ich will kaufen“, „Gib mir den Link“, „Ich bin bereit“, „Wo kann ich bezahlen“), dann gib ihm sofort den passenden Kauf-Link aus – ohne weitere Rückfragen.
-
 Wenn dein aktueller Auftraggeber ({auftraggeber}) eigene Produkte gespeichert hat und es inhaltlich zum Gespräch passt, dann bringe charmant und professionell passende Empfehlungen ein:
-{products_text}
-
-Erwähne Produkte niemals plump oder unpassend. Du bist wie eine menschliche Top-Verkäuferin.
+{extra_products}
 """
     })
     st.session_state.system_message_added = True
+
+conn.close()
