@@ -38,6 +38,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "tentary_loaded" not in st.session_state:
     st.session_state.tentary_loaded = False
+if "product_entries" not in st.session_state:
+    st.session_state.product_entries = 1
 
 # --- URL-Parameter auslesen ---
 query_params = st.experimental_get_query_params()
@@ -123,19 +125,28 @@ if st.session_state.authenticated:
     # --- Dynamische Produktauswahl ---
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 📅 Zusätzliche Produkte")
-    add_products = st.sidebar.checkbox("➕ Zusätzliche Produkte eintragen")
-    if add_products:
-        with st.sidebar.form("dynamic_product_form"):
-            product_name = st.text_input("Produktname")
-            product_desc = st.text_area("Produktbeschreibung")
-            product_link = st.text_input("Produktlink")
-            save_product = st.form_submit_button("📂 Produkt speichern")
-            if save_product and product_name and product_desc and product_link:
-                cursor.execute("""
-                    INSERT INTO selly_products (email, product_name, product_description, product_link)
-                    VALUES (%s, %s, %s, %s)
-                """, (st.session_state.user_email, product_name, product_desc, product_link))
-                conn.commit()
-                st.sidebar.success("✅ Produkt erfolgreich gespeichert!")
+
+    if st.sidebar.button("+ Weiteres Produkt hinzufügen"):
+        st.session_state.product_entries += 1
+
+    with st.sidebar.form("dynamic_product_form"):
+        for i in range(st.session_state.product_entries):
+            st.markdown(f"#### Produkt {i + 1}")
+            name = st.text_input(f"Produktname {i + 1}", key=f"pname_{i}")
+            desc = st.text_area(f"Produktbeschreibung {i + 1}", key=f"pdesc_{i}")
+            link = st.text_input(f"Produktlink {i + 1}", key=f"plink_{i}")
+        save_products = st.form_submit_button("📂 Alle Produkte speichern")
+        if save_products:
+            for i in range(st.session_state.product_entries):
+                name = st.session_state.get(f"pname_{i}")
+                desc = st.session_state.get(f"pdesc_{i}")
+                link = st.session_state.get(f"plink_{i}")
+                if name and desc and link:
+                    cursor.execute("""
+                        INSERT INTO selly_products (email, product_name, product_description, product_link)
+                        VALUES (%s, %s, %s, %s)
+                    """, (st.session_state.user_email, name, desc, link))
+            conn.commit()
+            st.sidebar.success("✅ Alle Produkte erfolgreich gespeichert!")
 
 conn.close()
