@@ -74,25 +74,12 @@ if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"])
     st.session_state.messages.append({
         "role": "assistant",
         "content": (
-            f"Hey ❤️ Schön, dass du da bist!
-"
-"
-
-"
-            f"Ich bin Selly – heute im Auftrag von **{auftraggeber}** da ✨
-
-"
-            f"Darf ich dir kurz 1 Frage stellen?
-Was wünschst du dir gerade am meisten:
-
-"
-            f"💡 Mehr Freiheit?
-"
-            f"📲 Kunden, die auf dich zukommen?
-"
-            f"💸 Ein Business, das automatisch verkauft?
-
-"
+            f"Hey ❤️ Schön, dass du da bist!\n\n"
+            f"Ich bin Selly – heute im Auftrag von **{auftraggeber}** da ✨\n\n"
+            f"Darf ich dir kurz 1 Frage stellen?\nWas wünschst du dir gerade am meisten:\n\n"
+            f"💡 Mehr Freiheit?\n"
+            f"📲 Kunden, die auf dich zukommen?\n"
+            f"💸 Ein Business, das automatisch verkauft?\n\n"
             f"Ich hätte da was für dich... Frag mich einfach 😉"
         )
     })
@@ -129,7 +116,7 @@ Dein Ziel ist es, zuerst ein kurzes Gespräch zu führen, das Vertrauen schafft 
 Nur wer selbst Käufer der 50 AI Business Bots ist, darf diese weiterempfehlen und Provision erhalten.
 Selly selbst ist kein provisionsfähiges Produkt – nur das Bundle oder die Bots allein.
 
-📎 Vorteile für Käufer:
+📌 Vorteile für Käufer:
 - Volle Umsetzungskraft durch KI – ohne Vorwissen
 - Schnellere Sichtbarkeit online
 - Zeitersparnis durch Automatisierung
@@ -201,7 +188,7 @@ with st.sidebar:
             if st.session_state.product_entries < 5:
                 if st.form_submit_button("🔁 Weiteres Produkt hinzufügen"):
                     st.session_state.product_entries += 1
-            if st.form_submit_button("💾 Produkte speichern"):
+            if st.form_submit_button("📅 Produkte speichern"):
                 user_email = st.session_state.get("user_email")
                 if user_email:
                     cursor.execute("DELETE FROM selly_products WHERE email = %s", (user_email,))
