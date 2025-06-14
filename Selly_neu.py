@@ -5,7 +5,7 @@ import psycopg2
 import os
 
 # --- Seiteneinstellungen ---
-st.set_page_config(page_title="Selly – deine KI Selling Queen", page_icon="👑", layout="centered")
+st.set_page_config(page_title="Selly – deine KI Selling Queen", layout="centered")
 st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
@@ -81,13 +81,14 @@ Wenn jemand kaufen will, biete:
 1. Die 50 AI Business Bots für 997€ – Link: {affiliate_link}
 2. Das Kombipaket Selly + Bots für 1296€ – Link: {affiliate_link_bundle}
 
-Handle immer wie eine kluge, menschliche Verkäuferin."
+Handle immer wie eine kluge, menschliche Verkäuferin.
+"""
     })
     st.session_state.system_message_added = True
 
 # --- Selly Bild & Begrüßung ---
 st.image("https://i.postimg.cc/CMr2Tbpj/Chat-GPT-Image-8-Juni-2025-21-23-19.png", width=250)
-st.title(":crown: Selly – deine KI Selling Queen")
+st.title("👑 Selly – deine KI Selling Queen")
 
 if len([msg for msg in st.session_state.messages if msg["role"] == "assistant"]) == 0:
     st.session_state.messages.append({
@@ -194,10 +195,9 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("""
- [Impressum](https://sarahtemmel.tentary.com/legal/207493326/contact)  
- [Datenschutz](https://sarahtemmel.tentary.com/legal/207493326/privacy)  
- <sub>Powered by Selly – The Empire</sub>
-""", unsafe_allow_html=True)
-
+    [Impressum](https://sarahtemmel.tentary.com/legal/207493326/contact)  
+    [Datenschutz](https://sarahtemmel.tentary.com/legal/207493326/privacy)  
+    <sub>Powered by Selly – The Empire</sub>
+    """, unsafe_allow_html=True)
 
 conn.close()
