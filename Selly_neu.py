@@ -156,6 +156,10 @@ with st.sidebar:
 
     if st.session_state.authenticated:
         st.markdown("---")
+        st.markdown(f"### 📢 Hier ist dein Link zum Teilen für Selly")
+        st.code(f"https://selly-bot.onrender.com/?a={st.session_state.tentary_id}")
+
+        st.markdown("---")
         st.markdown("### 📋 Meine Produkte bearbeiten")
         with st.form("produkte_form"):
             for i in range(1, 6):
